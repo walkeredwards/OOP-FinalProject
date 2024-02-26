@@ -1,0 +1,9 @@
+Chess game (pygame?)
+Class for each type of piece in the game.
+Pawn, Bishop, Knight, Rook, King, Queen.
+Each piece/class will have it's own rules to how it moves according to the rules of the game.
+The pawn will have a function in it's class to be able to turn
+into any other piece it chooses (other than a king) if it reaches the other end of the board.
+Each piece will have a way to be taken off the board if it is taken by another piece.
+If the king is taken by another piece, the game will end.
+Player class with 2 possible players; keeps track of what color each player is and what pieces that have available to them. Also give each player the option to foreit the game.
