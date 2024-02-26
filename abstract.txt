@@ -8,3 +8,15 @@ Each piece will have a way to be taken off the board if it is taken by another p
 If the king is in checkmate, the game will end.
 Player class with 2 possible players; keeps track of what color each player is and what pieces that have available to them. 
 Also give each player the option to foreit the game.
+
+The project will use object oriented design and utilize the pygame
+library to create a functional chess game. The game will have various
+classes and modules for things such as keeping track of the board, 
+players' color and moves, and possible movement for each of the different 
+types of pieces in the game. The classes for each piece will have unique
+movement sets and abilities and inherit from a parent class Piece. The
+presentation will include a demonstration of the working game and an 
+explanation of how all the segments of the code work together to create
+a functional game. The aim of this presentation is to demonstrate the 
+importance of object oriented design in programming and how it is able
+to improve the efficiency, readability, and reusability of code.
