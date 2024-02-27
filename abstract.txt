@@ -1,3 +1,18 @@
+Title: The Game of Chess
+
+ 
+Abstract:
+
+This project introduces a Pygame-based chess game with a structured class system for each piece type, 
+including Pawn, Bishop, Knight, Rook, King, and Queen. The Pawn class features a promotion function 
+allowing it to transform into any non-King piece upon reaching the opposing board end. The game includes 
+mechanisms for piece capture and checkmate detection, ending upon checkmate. A Player class manages 
+player attributes, colors, available pieces, and forfeit options. This implementation showcases 
+object-oriented design and advanced chess functionalities within a concise framework meeting all the 
+technical requirements such as unittesting, UML diagrams, documentations, etc.
+
+
+
 Chess game using pygame.
 Class for each type of piece in the game.
 Pawn, Bishop, Knight, Rook, King, Queen.
