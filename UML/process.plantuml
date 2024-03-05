@@ -8,8 +8,8 @@ while (player turn)
         repeat while (valid move) is (no)
     endif
     :move peice;
-    backward:swap player input;
-endwhile (checkmate, stale mate, or forfeit)
+    backward:swap player turn;
+endwhile (checkmate, stalemate, or forfeit)
     :end game;
 stop
 @enduml
