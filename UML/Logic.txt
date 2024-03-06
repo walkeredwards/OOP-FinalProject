@@ -44,35 +44,23 @@ enum Color {
 }
 
 class Position {
-    -row: int
-    -col: int
-    +Position(row: int, col: int)
-    +getRow(): int
-    +getCol(): int
+    -x: int
+    -y: int
+    +Position(x: int, y: int)
+    +getX(): int
+    +getY(): int
 }
 
 class Board {
     -pieces: Piece[]
     +initialize(): void
-    +movePiece(fromPosition: Position, toPosition: Position): bool
+    +movePiece(piece: Piece, fromPosition: Position, toPosition: Position): bool
     +isCheck(color: Color): bool
     +isCheckmate(color: Color): bool
-    +isStalemate(color: Color): bool
+    +isDraw(color: Color): bool
     +getPieceAt(position: Position): Piece
 }
 
-class TrainingData
-{
-    player1: Player
-    player2: Player
-    p1moves: List[str]
-    p2moves: List[str]
-    winner: Player
-    draw: bool
-    startTest: datetime
-    endTest: datetime
-    k: int
-}
 
 Piece <|-- Pawn
 Piece <|-- Rook
@@ -81,15 +69,13 @@ Piece <|-- Bishop
 Piece <|-- Queen
 Piece <|-- King
 
-Pawn "1" *-- "8" Position
-Rook "2" *-- "14" Position
-Knight "2" *-- "10" Position
-Bishop "2" *-- "14" Position
-Queen "1" *-- "14" Position
-King "1" *-- "1" Position
+Pawn "8" *-- Position
+Rook "2" *-- Position
+Knight "2" *-- Position
+Bishop "2" *-- Position
+Queen "1" *-- Position
+King "1" *-- Position
 
-Board "1" *-- "64" Position
-
-TrainingData --|> Board
+Board "1" *-- Position
 
 @enduml
