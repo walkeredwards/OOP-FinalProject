@@ -1,0 +1,20 @@
+@startuml Development View
+
+package Chess{
+    top to bottom direction
+    component [Tests] as test
+    component [View Board] as view
+    component [Data Model] as data
+
+    test ..> view
+    test ..> data
+    view ..> data
+}
+
+component [pytest] as pytest
+test ..> pytest
+component [Pygame] as pygame
+
+view ..> pygame
+
+@enduml
