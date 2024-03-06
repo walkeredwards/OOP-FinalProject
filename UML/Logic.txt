@@ -1,0 +1,95 @@
+@startuml Logic
+
+abstract class Piece {
+    -color: Color
+    +Piece(color: Color)
+    +getColor(): Color
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Pawn {
+    -firstMove: bool
+    +Pawn(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Rook {
+    +Rook(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Knight {
+    +Knight(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Bishop {
+    +Bishop(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Queen {
+    +Queen(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class King {
+    +King(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+enum Color {
+    WHITE
+    BLACK
+}
+
+class Position {
+    -row: int
+    -col: int
+    +Position(row: int, col: int)
+    +getRow(): int
+    +getCol(): int
+}
+
+class Board {
+    -pieces: Piece[]
+    +initialize(): void
+    +movePiece(fromPosition: Position, toPosition: Position): bool
+    +isCheck(color: Color): bool
+    +isCheckmate(color: Color): bool
+    +isStalemate(color: Color): bool
+    +getPieceAt(position: Position): Piece
+}
+
+class TrainingData
+{
+    player1: Player
+    player2: Player
+    p1moves: List[str]
+    p2moves: List[str]
+    winner: Player
+    draw: bool
+    startTest: datetime
+    endTest: datetime
+    k: int
+}
+
+Piece <|-- Pawn
+Piece <|-- Rook
+Piece <|-- Knight
+Piece <|-- Bishop
+Piece <|-- Queen
+Piece <|-- King
+
+Pawn "1" *-- "8" Position
+Rook "2" *-- "14" Position
+Knight "2" *-- "10" Position
+Bishop "2" *-- "14" Position
+Queen "1" *-- "14" Position
+King "1" *-- "1" Position
+
+Board "1" *-- "64" Position
+
+TrainingData --|> Board
+
+@enduml
