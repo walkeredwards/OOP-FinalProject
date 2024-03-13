@@ -1,0 +1,15 @@
+@startuml process
+start
+while (player turn)
+    :player move;
+    if (valid move?) then (yes)
+    else (no)
+        repeat:diffrent move;
+        repeat while (valid move) is (no)
+    endif
+    :move peice;
+    backward:swap player turn;
+endwhile (checkmate, stalemate, or forfeit)
+    :end game;
+stop
+@enduml

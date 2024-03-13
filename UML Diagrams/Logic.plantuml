@@ -1,0 +1,81 @@
+@startuml Logic
+
+abstract class Piece {
+    -color: Color
+    +Piece(color: Color)
+    +getColor(): Color
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Pawn {
+    -firstMove: bool
+    +Pawn(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Rook {
+    +Rook(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Knight {
+    +Knight(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Bishop {
+    +Bishop(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class Queen {
+    +Queen(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+class King {
+    +King(color: Color)
+    +isValidMove(fromPosition: Position, toPosition: Position, board: Board): bool
+}
+
+enum Color {
+    WHITE
+    BLACK
+}
+
+class Position {
+    -x: int
+    -y: int
+    +Position(x: int, y: int)
+    +getX(): int
+    +getY(): int
+}
+
+class Board {
+    -pieces: Piece[]
+    +initialize(): void
+    +movePiece(piece: Piece, fromPosition: Position, toPosition: Position): bool
+    +isCheck(color: Color): bool
+    +isCheckmate(color: Color): bool
+    +isDraw(color: Color): bool
+    +getPieceAt(position: Position): Piece
+}
+
+
+Piece <|-- Pawn
+Piece <|-- Rook
+Piece <|-- Knight
+Piece <|-- Bishop
+Piece <|-- Queen
+Piece <|-- King
+
+Pawn "8" *-- Position
+Rook "2" *-- Position
+Knight "2" *-- Position
+Bishop "2" *-- Position
+Queen "1" *-- Position
+King "1" *-- Position
+
+Board "1" *-- Position
+
+@enduml
