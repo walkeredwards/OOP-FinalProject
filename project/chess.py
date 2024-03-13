@@ -28,16 +28,19 @@ while running:
 # Keeps track of where/which pieces are on the board and updates as 
 # players take turns with moves.
 
-"""
+
 class Board():
     
     # Create a window with pygame and set up images/assets for the chess board
     def window:
 
 
-
 class Piece():
+    def __init__(self, color: str) -> str:
+        self._color = color
 
+    def color(self) -> str:
+        return self._color
 
 
 # Types of pieces which all have different move sets.
@@ -69,4 +72,12 @@ class Queen(Piece):
 class King(Piece):
     # Can only move to one of the 8 squares directly surrounding it
 
-"""
+
+class Positions:
+
+
+class Game:
+    
+
+if __name__ == "__main__":
+    game = Game
