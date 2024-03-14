@@ -1,0 +1,30 @@
+4+1 Views
+
+Logical view
+ • A logical view of the data entities, their static attributes, and their 
+relationships. This is the heart of object-oriented design.
+
+Process view
+ • A process view that describes how the data is processed. This can take a 
+variety of forms, including state models, activity diagrams, and sequence 
+diagrams.
+
+Development view
+ • A development view of the code components to be built. This diagram 
+shows relationships among software components. This is used to show how 
+class definitions are gathered into modules and packages.
+
+Physical view
+ • A physical view of the application to be integrated and deployed. In cases 
+where an application follows a common design pattern, a sophisticated 
+diagram isn't necessary. In other cases, a diagram is essential to show how a 
+collection of components are integrated and deployed.
+
+Context view
+ • A context view that provides a unifying context for the other four views. 
+The context view will often describe the actors that use (or interact) with 
+the system to be built. This can involve human actors as well as automated 
+interfaces: both are outside the system, and the system must respond to these 
+external actors.
+
+Common to start with the context view.

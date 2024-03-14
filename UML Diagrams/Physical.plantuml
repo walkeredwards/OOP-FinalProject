@@ -1,0 +1,19 @@
+@startuml Physical
+
+package "Client" as client{
+    component "ClientCLI"
+}
+
+interface "Python" as python
+
+package "Program" as program{
+
+    [Pygame] as pygame
+    [User_Input] as userinput
+    pygame --> userinput
+}
+
+client --> python
+python --> program
+
+@enduml
