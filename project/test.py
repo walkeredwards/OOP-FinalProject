@@ -57,6 +57,43 @@ class King():
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/king.png'), (90, 90))
 
 
+# List of starting pieces for each color, will change to class implementation later
+black_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+black_positions = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
+                   (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
+
+white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
+                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
+white_positions = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
+                   (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)] 
+
+
+# Load in chess piece images and scale to 100 pixels by 100 pixels, replace later with code from images.py file
+# black pieces
+black_queen = pygame.transform.scale(pygame.image.load('images/black/queen.png'), (90, 90))
+black_king = pygame.transform.scale(pygame.image.load('images/black/king.png'), (90, 90))
+black_bishop = pygame.transform.scale(pygame.image.load('images/black/bishop.png'), (90, 90))
+black_rook = pygame.transform.scale(pygame.image.load('images/black/rook.png'), (90, 90))
+black_knight = pygame.transform.scale(pygame.image.load('images/black/knight.png'), (90, 90))
+black_pawn = pygame.transform.scale(pygame.image.load('images/black/pawn.png'), (90, 90))
+
+# white pieces
+white_queen = pygame.transform.scale(pygame.image.load('images/white/queen.png'), (90, 90))
+white_king = pygame.transform.scale(pygame.image.load('images/white/king.png'), (90, 90))
+white_bishop = pygame.transform.scale(pygame.image.load('images/white/bishop.png'), (90, 90))
+white_rook = pygame.transform.scale(pygame.image.load('images/white/rook.png'), (90, 90))
+white_knight = pygame.transform.scale(pygame.image.load('images/white/knight.png'), (90, 90))
+white_pawn = pygame.transform.scale(pygame.image.load('images/white/pawn.png'), (90, 90))
+
+# List with images of all the black pieces and white pieces
+black_images = [black_pawn, black_queen, black_king, black_knight, black_rook, black_bishop]
+white_images = [white_pawn, white_queen, white_king, white_knight, white_rook, white_bishop]
+
+# List containing types of pieces
+pieces = ['pawn', 'queen', 'king', 'knight', 'rook', 'bishop']
+
+
 class Board:
     # Set up the squares on the board
     def make_board():
@@ -84,6 +121,21 @@ class Board:
         # 10 is from size of each block (100 by 100) minus size of each piece (90 by 90)
         offset_x = w + 10 // 2
         offset_y = h + 10 // 2
+
+        for piece in range(len(black_pieces)):
+            index = pieces.index(black_pieces[piece])
+            if black_pieces[piece] == 'pawn':
+                screen.blit(black_pawn, (black_positions[piece][0] * 100 + offset_x, black_positions[piece][1] * 100 + offset_y))
+            else:
+                screen.blit(black_images[index], (black_positions[piece][0] * 100 + offset_x, black_positions[piece][1] * 100 + offset_y))
+
+        for piece in range(len(white_pieces)):
+            index = pieces.index(white_pieces[piece])
+            if white_pieces[piece] == 'pawn':
+                screen.blit(white_pawn, (white_positions[piece][0] * 100 + offset_x, white_positions[piece][1] * 100 + offset_y))
+            else:
+                screen.blit(white_images[index], (white_positions[piece][0] * 100 + offset_x, white_positions[piece][1] * 100 + offset_y))
+
 
 
 # Main function with game loop
