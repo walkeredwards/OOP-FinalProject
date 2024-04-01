@@ -1,0 +1,21 @@
+@startuml Context View
+
+left to right direction
+
+actor "Chess Rule Setter" as crs
+actor "Player 1" as p1
+actor "Player 2" as p2
+
+package Chess{
+    usecase "Provide the ruleset for chess." as (Rules)
+    usecase "Set parameters for moving pieces and check the board to see if move is legal." as (Set)
+
+    usecase "Attempt/request to move a piece on the board." as (Request)
+}
+
+crs --> Rules
+crs --> Set
+p1 --> Request
+p2 --> Request
+
+@enduml
