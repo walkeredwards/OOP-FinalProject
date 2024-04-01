@@ -17,12 +17,47 @@ timer = pygame.time.Clock()
 fps = 60
 
 
+
+
 # Types of pieces which all have different move sets.
 class Pawn():
     # Can move 2 spaces forward on first move, but only 1 space after.
-    def __init__(self, color) -> None:
+    def __init__(self, color, location) -> None:
         self._color = color
+        self._location = location
+        self.first_move = True
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/pawn.png'), (90, 90))
+
+    def get_location(self):
+        return self._location
+        
+    def checkPawn(self, new_location) -> bool:
+        if self._color == "white":
+            friendly_locations = get_white_locations()
+            enemy_locations = get_black_locations()
+        else:
+            friendly_locations = get_black_locations()
+            enemy_locations = get_white_locations()
+
+        if new_location in friendly_locations:
+            return False
+        if (new_location[0] == self._location[0] + 1  or new_location[0] == self._location[0] -1) \
+            and new_location[1] == self._location[1] + 1 and new_location in enemy_locations:
+            return True
+              
+        if new_location[0] == self._location[0] and new_location[1] == self._location[1] + 1:
+            
+            if new_location not in friendly_locations and new_location not in enemy_locations:
+                return True
+            else:
+                return False
+        if self._location[1] == 1 and new_location[1] == 3 and new_location[0] == self._location[0]:
+            if (self._location[0], 2) not in friendly_locations and (self._location[0], 2) not in enemy_locations and \
+            (self._location[0], 3) not in friendly_locations and (self._location[0], 3) not in enemy_locations:
+                return True
+        return False
+
+
 
     #def promotion():
         """ If pawn reaches end of board, player can promote to piece of choosing"""
@@ -30,16 +65,103 @@ class Pawn():
 
 class Bishop():
     # Can move diagonally
-    def __init__(self, color) -> None:
+    def __init__(self, color, location) -> None:
         self._color = color
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/bishop.png'), (90, 90))
+        self._location = location
+
+    def get_location(self):
+        return self._location
+    
+    def check_bishop(self, new_location):
+        if self._color == 'white':
+            enemy_locations = get_black_locations()
+            friendly_locations = get_white_locations()
+        else:
+            friendly_locations = get_black_locations()
+            enemy_locations = get_white_locations()
+
+        # Calculate the difference in coordinates between the current position and the new move
+        dx = new_location[0] - self._location[0]
+        dy = new_location[1] - self._location[1]
+
+        # Check if the move is a valid diagonal move
+        if abs(dx) != abs(dy):
+            return False  # Not a valid diagonal move
+        
+        # Determine the direction of movement (up-left, up-right, down-left, down-right)
+        if dx > 0:
+            direction_x = 1 
+        else:
+            direction_x = -1
+        if dy > 0:
+            direction_y = 1
+        else:
+            direction_y = -1
+
+        # Iterate along the diagonal path until reaching the new move or the edge of the board
+        current_x = self._location[0]
+        current_y = self._location[1]
+        while current_x != new_location[0] and current_y != new_location[1]:
+            current_x += direction_x
+            current_y += direction_y
+            
+            # Check if the new position is within the board boundaries
+            if not (0 <= current_x <= 7 and 0 <= current_y <= 7):
+                return False  # Out of board
+            
+            # Check if the new position is occupied by a friendly piece
+            if (current_x, current_y) in friendly_locations:
+                return False  # Path is blocked by friendly piece
+            
+            # Check if the new position is occupied by an enemy piece
+            if (current_x, current_y) in enemy_locations:
+                return True  # Valid move, can capture enemy piece
+          
+        # Reached the requested location without encountering any pieces
+        return True if new_location not in friendly_locations else False  # Check if the requested location is open or occupied by an enemy piece
+
+
 
 
 class Knight():
     # Can move in an L shape (e.g. up/down 2, over 1)
-    def __init__(self, color) -> None:
+    def __init__(self, color, location) -> None:
         self._color = color
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/knight.png'), (90, 90))
+        self._location = location
+    
+    def get_location(self):
+        return self._location
+    
+    def check_knight(self, new_location):
+        if self._color == 'white':
+            enemy_locations = get_black_locations()
+            friendly_locations = get_white_locations()
+        else:
+            friendly_locations = get_black_locations()
+            enemy_locations = get_white_locations()
+
+        # Calculate the difference in coordinates between the current position and the new move
+        dx = abs(new_location[0] - self._location[0])
+        dy = abs(new_location[1] - self._location[1])
+
+        # Check if the move is a valid knight move (L shape)
+        if (dx, dy) not in [(1, 2), (2, 1)]:
+            return False  # Not a valid knight move
+
+        # Check if the new position is within the board boundaries
+        if not (0 <= new_location[0] <= 7 and 0 <= new_location[1] <= 7):
+            return False  # Out of board boundaries, invalid move
+
+        # Check if the new position is occupied by a friendly piece
+        if new_location in friendly_locations:
+            return False  # Cannot move to a square occupied by a friendly piece
+
+        # Check if the new position is occupied by an enemy piece or is open
+        if new_location in enemy_locations or new_location not in friendly_locations:
+            return True
+
 
 
 class Rook():
@@ -88,6 +210,7 @@ Black_Rook2 = Rook("black")
 
 black_pieces = [Black_Pawn1, Black_Pawn2, Black_Pawn3, Black_Pawn4, Black_Pawn5, Black_Pawn6, Black_Pawn7, Black_Pawn8,
                 Black_Rook1, Black_Knight1, Black_Bishop1, Black_Queen, Black_King, Black_Bishop2, Black_Knight2, Black_Rook2]
+black_locations = []
 
 """ Initialize white pieces for player 2 and put them in a list in an order that 
     corresponds to their starting locations on the board"""
@@ -112,6 +235,20 @@ White_Rook2 = Rook("White")
 
 white_pieces = [White_Pawn1, White_Pawn2, White_Pawn3, White_Pawn4, White_Pawn5, White_Pawn6, White_Pawn7, White_Pawn8,
                 White_Rook1, White_Knight1, White_Bishop1, White_Queen, White_King, White_Bishop2, White_Knight2, White_Rook2]
+
+white_locations = []
+
+def get_white_locations():
+    for piece in white_pieces:
+        location = piece.get_location()
+        white_locations.append(location)
+    return white_locations 
+
+def get_black_locations():
+    for piece in black_pieces:
+        location = piece.get_location()
+        black_locations.append(location)
+    return black_locations 
 
 
 class Board:
