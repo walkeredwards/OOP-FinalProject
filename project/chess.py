@@ -13,6 +13,7 @@ HEIGHT = 900
 
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.display.set_caption("Chess")
+font = pygame.font.Font('font/ka1.ttf', 30)
 timer = pygame.time.Clock()
 fps = 60
 
@@ -39,11 +40,17 @@ Chess Board Initial Layout
 """ Types of pieces which all have different move sets."""
 class Bishop():
     # Can move diagonally
-    def __init__(self, color: str, x: int, y: int) -> None:
+    def __init__(self, name: str, color: str, x: int, y: int) -> None:
+        self._name = name
         self._color = color
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/bishop.png'), (90, 90))
         self._x = x
         self._y = y
+
+    @property
+    def name(self) -> str:
+        """ getter for Bishop's name"""
+        return self._name
 
     @property
     def x(self) -> int:
@@ -58,11 +65,17 @@ class Bishop():
 
 class Rook():
     # Can move horizontally or vertically
-    def __init__(self, color: str, x: int, y: int) -> None:
+    def __init__(self, name: str, color: str, x: int, y: int) -> None:
+        self._name = name
         self._color = color
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/rook.png'), (90, 90))
         self._x = x
         self._y = y
+
+    @property
+    def name(self) -> str:
+        """ getter for Rook's name"""
+        return self._name
 
     @property
     def x(self) -> int:
@@ -77,11 +90,17 @@ class Rook():
 
 class Knight():
     # Can move in an L shape (e.g. up/down 2, over 1)
-    def __init__(self, color: str, x: int, y: int) -> None:
+    def __init__(self, name: str, color: str, x: int, y: int) -> None:
+        self._name = name
         self._color = color
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/knight.png'), (90, 90))
         self._x = x
         self._y = y
+
+    @property
+    def name(self) -> str:
+        """ getter for Knight's name"""
+        return self._name
 
     @property
     def x(self) -> int:
@@ -96,12 +115,18 @@ class Knight():
 
 class Queen():
     # Can move horizontally, vertically, diagonally, and to any of the 8 squares directly surrounding
-    def __init__(self, color: str, x: int, y: int) -> None:
+    def __init__(self, name: str, color: str, x: int, y: int) -> None:
+        self._name = name
         self._color = color
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/queen.png'), (90, 90))
         self._x = x
         self._y = y
-    
+
+    @property
+    def name(self) -> str:
+        """ getter for Queen's name"""
+        return self._name
+
     @property
     def x(self) -> int:
         """ getter for Queen's x coordinate"""
@@ -116,11 +141,17 @@ class Queen():
 
 class King():
     # Can only move to one of the 8 squares directly surrounding it
-    def __init__(self, color: str, x: int, y: int) -> None:
+    def __init__(self, name: str, color: str, x: int, y: int) -> None:
+        self._name = name
         self._color = color
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/king.png'), (90, 90))
         self._x = x
         self._y = y
+
+    @property
+    def name(self) -> str:
+        """ getter for King's name"""
+        return self._name
 
     @property
     def x(self) -> int:
@@ -134,11 +165,17 @@ class King():
 
 class Pawn():
     # Can move 2 spaces forward on first move, but only 1 space after.
-    def __init__(self, color: str, x: int, y: int, hasMoved: bool) -> None:
+    def __init__(self, name: str, color: str, x: int, y: int, hasMoved: bool) -> None:
+        self._name = name
         self._color = color
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/pawn.png'), (90, 90))
         self._x = x
         self._y = y
+
+    @property
+    def name(self) -> str:
+        """ getter for Pawn's name"""
+        return self._name
 
     @property
     def x(self) -> int:
@@ -165,58 +202,63 @@ class Pawn():
 """ Initialize black pieces for player 1 and put them in a list in an order that 
     corresponds to their starting locations on the board"""
 # Row 1
-Black_Rook1 = Rook("black", 0, 0)
-Black_Knight1 = Knight("black", 1, 0)
-Black_Bishop1 = Bishop("black", 2, 0)
-Black_Queen = Queen("black", 3, 0)
-Black_King = King("black", 4, 0)
-Black_Bishop2 = Bishop("black", 5, 0)
-Black_Knight2 = Knight("black", 6, 0)
-Black_Rook2 = Rook("black", 7, 0)
+Black_Rook1 = Rook("Black_Rook_1", "black", 0, 0)
+Black_Knight1 = Knight("Black_Knight_1", "black", 1, 0)
+Black_Bishop1 = Bishop("Black_Bishop_1", "black", 2, 0)
+Black_Queen1 = Queen("Black_Queen_1", "black", 3, 0)
+Black_King = King("Black_King", "black", 4, 0)
+Black_Bishop2 = Bishop("Black_Bishop_2", "black", 5, 0)
+Black_Knight2 = Knight("Black_Knight_2", "black", 6, 0)
+Black_Rook2 = Rook("Black_Rook_2", "black", 7, 0)
 # Row 2
-Black_Pawn1 = Pawn("black", 0, 1, False)
-Black_Pawn2 = Pawn("black", 1, 1, False)
-Black_Pawn3 = Pawn("black", 2, 1, False)
-Black_Pawn4 = Pawn("black", 3, 1, False)
-Black_Pawn5 = Pawn("black", 4, 1, False)
-Black_Pawn6 = Pawn("black", 5, 1, False)
-Black_Pawn7 = Pawn("black", 6, 1, False)
-Black_Pawn8 = Pawn("black", 7, 1, False)
+Black_Pawn1 = Pawn("Black_Pawn_1", "black", 0, 1, False)
+Black_Pawn2 = Pawn("Black_Pawn_2", "black", 1, 1, False)
+Black_Pawn3 = Pawn("Black_Pawn_3", "black", 2, 1, False)
+Black_Pawn4 = Pawn("Black_Pawn_4", "black", 3, 1, False)
+Black_Pawn5 = Pawn("Black_Pawn_5", "black", 4, 1, False)
+Black_Pawn6 = Pawn("Black_Pawn_6", "black", 5, 1, False)
+Black_Pawn7 = Pawn("Black_Pawn_7", "black", 6, 1, False)
+Black_Pawn8 = Pawn("Black_Pawn_8", "black", 7, 1, False)
 
 black_pieces = [Black_Pawn1, Black_Pawn2, Black_Pawn3, Black_Pawn4, Black_Pawn5, Black_Pawn6, Black_Pawn7, Black_Pawn8,
-                Black_Rook1, Black_Knight1, Black_Bishop1, Black_Queen, Black_King, Black_Bishop2, Black_Knight2, Black_Rook2]
+                Black_Rook1, Black_Knight1, Black_Bishop1, Black_Queen1, Black_King, Black_Bishop2, Black_Knight2, Black_Rook2]
 
 """ Initialize white pieces for player 2 and put them in a list in an order that 
     corresponds to their starting locations on the board"""
 # Row 1
-White_Pawn1 = Pawn("White", 0, 6, False)
-White_Pawn2 = Pawn("White", 1, 6, False)
-White_Pawn3 = Pawn("White", 2, 6, False)
-White_Pawn4 = Pawn("White", 3, 6, False)
-White_Pawn5 = Pawn("White", 4, 6, False)
-White_Pawn6 = Pawn("White", 5, 6, False)
-White_Pawn7 = Pawn("White", 6, 6, False)
-White_Pawn8 = Pawn("White", 7, 6, False)
+White_Pawn1 = Pawn("White_Pawn_1", "white", 0, 6, False)
+White_Pawn2 = Pawn("White_Pawn_2", "white", 1, 6, False)
+White_Pawn3 = Pawn("White_Pawn_3", "white", 2, 6, False)
+White_Pawn4 = Pawn("White_Pawn_4", "white", 3, 6, False)
+White_Pawn5 = Pawn("White_Pawn_5", "white", 4, 6, False)
+White_Pawn6 = Pawn("White_Pawn_6", "white", 5, 6, False)
+White_Pawn7 = Pawn("White_Pawn_7", "white", 6, 6, False)
+White_Pawn8 = Pawn("White_Pawn_8", "white", 7, 6, False)
 # Row 2
-White_Rook1 = Rook("White", 0, 7)
-White_Knight1 = Knight("White", 1, 7)
-White_Bishop1 = Bishop("White", 2, 7)
-White_Queen = Queen("White", 3, 7)
-White_King = King("White", 4, 7)
-White_Bishop2 =Bishop("White", 5, 7)
-White_Knight2 = Knight("White", 6, 7)
-White_Rook2 = Rook("White", 7, 7)
+White_Rook1 = Rook("White_Rook_1", "White", 0, 7)
+White_Knight1 = Knight("White_Knight_1", "White", 1, 7)
+White_Bishop1 = Bishop("White_Bishop_1", "White", 2, 7)
+White_Queen1 = Queen("White_Queen_1", "White", 3, 7)
+White_King = King("White_King", "White", 4, 7)
+White_Bishop2 =Bishop("White_Bishop_2", "White", 5, 7)
+White_Knight2 = Knight("White_Knight_2", "White", 6, 7)
+White_Rook2 = Rook("White_Rook_2", "White", 7, 7)
 
 white_pieces = [White_Pawn1, White_Pawn2, White_Pawn3, White_Pawn4, White_Pawn5, White_Pawn6, White_Pawn7, White_Pawn8,
-                White_Rook1, White_Knight1, White_Bishop1, White_Queen, White_King, White_Bishop2, White_Knight2, White_Rook2]
+                White_Rook1, White_Knight1, White_Bishop1, White_Queen1, White_King, White_Bishop2, White_Knight2, White_Rook2]
 
 
-class Board:
+class Board:    
     # Set up the squares on the board
     def make_board():
+        # Make background color of screen black
+        screen.fill('black')
         # Set w and h for board to be in middle of the screen
         w = (WIDTH - 800) // 2
         h = (HEIGHT - 800) // 2
+
+        # White border around board
+        pygame.draw.rect(screen, 'white', [395, 45, 810, 810])
 
         for row in range(8):
             for col in range(8):
@@ -233,42 +275,117 @@ class Board:
         w = (WIDTH - 800) // 2
         h = (HEIGHT - 800) // 2
 
-        """ Enumerate allows you to keep track of the position/index of the 
-        piece in the list while also being able to call the object of that piece.
+        """ For loop with enumerate to keep track of the position/index of the 
+        piece in the list while also calling instance of the piece.
         """
-        # Set up black pieces to the top of the board
-        for index, piece in enumerate(black_pieces[8:]): # Last 8 pieces in black_pieces list
-            # Sets up main pieces at top which is row 0. (h + 0 * 100)
-            screen.blit(piece._image, (w + index * 100, h))
-            # Sets up pawns at second to top which is row 1.
-        for index, piece in enumerate(black_pieces[:8]): # First 8 pieces in black_pieces list
-            screen.blit(piece._image, (w + index * 100, h + 1 * 100))
-        
-        # Set up white pieces to the bottom of the board
-        for index, piece in enumerate(white_pieces[:8]): # First 8 pieces in white_pieces list
-            # Sets up pawns at second to bottom which is row 6.
-            screen.blit(piece._image, (w + index * 100, h + 6 * 100))
-        
-        for index, piece in enumerate(white_pieces[8:]): # Last 8 pieces in white_pieces list
-            # Sets up main pieces at bottom which is row 7.
-            screen.blit(piece._image, (w + index * 100, h + 7 * 100))
+
+        for piece in black_pieces:
+            screen.blit(piece._image, (w + piece.x * 100, h + piece.y * 100))
+
+        for piece in white_pieces:
+            screen.blit(piece._image, (w + piece.x * 100, h + piece.y * 100))
 
 
-# Main function with game loop
+    def checkSquare(turn: str, x: int, y: int) -> bool:
+        """ Returns true if square is occupied by piece of same color."""
+        if (turn == "black"):
+            for piece in black_pieces:
+                if (piece.x == x and piece.y == y):
+                    return True
+        else:
+            for piece in white_pieces:
+                if (piece.x == x and piece.y == y):
+                    return True
+        
+        return False
+
+
+    # Move this to a class later
+    def movePiece(turn: str):
+        """ Function that handles clicking on a piece and moving it to another square."""
+        w = (WIDTH - 800) // 2
+        h = (HEIGHT - 800) // 2
+
+        pos_x, pos_y = pygame.mouse.get_pos()
+        x, y = modifiedCoordinates(pos_x, pos_y)
+
+        # If no piece is selected
+        if (selected == None):
+            if (turn == "black"):
+                for piece in black_pieces:
+                    if (piece.x == x and piece.y == y):
+                        print(piece._name)
+                        square = (x, y)
+                        pygame.draw.rect(screen, 'green', [w + x * 100, h + y * 100, 100, 100])
+                        return piece
+
+            else: # If it is white turn
+                for piece in white_pieces:
+                    if (piece.x == x and piece.y == y):
+                        print(piece._name)
+                        square = (x, y)
+                        pygame.draw.rect(screen, 'hot pink', [w + x * 100, h + y * 100, 100, 100])
+                        return piece
+        
+        # If a piece has been selected
+        else:
+            # Need add function make sure selected square to move piece to is a valid move
+            if (not Board.checkSquare(turn, x, y)):
+                selected._x = x
+                selected._y = y
+                # Need to add function after piece is moved to capture piece if it moved to a square with an enemy
+                return None
+
+
+def modifiedCoordinates(pos_x, pos_y) -> int:
+    """ Take in mouse click coordinates and convert them to coordinates in range (0, 0) to (7, 7)
+    for the squares on the board.
+    Dimensions of board: 800 by 800     100 by 100 squares
+    Top left: x = 400, y = 50        Bottom left: x = 1200, y = 50
+    Top right: x = 400, y = 850      Bottom right: x = 1200, y = 850
+    """
+    x = int((pos_x - 400) / 100)
+    y = int((pos_y - 50) / 100)
+
+    return x, y
+
+
+def switchTurn(turn: str) -> str:
+    """ Function to alternate turns between players"""
+    if (turn == "white"):
+        return "black"
+    return "white"
+
+
+""" Main function with game loop"""
 if __name__ == "__main__":
     running = True
+    selected = None
+    turn = "white"
     while running:
         timer.tick(fps)
-        screen.fill('black')
-        # Create 8 by 8 board and put on screen
+
+        # Create 8 by 8 board and add pieces onto the board
         game = Board
         game.make_board()
         game.setup_pieces()
 
+        """ Move later to function to put on screen for whoever's turn it is"""
+        if(turn == "black"):
+            screen.blit(font.render("BLACK'S TURN", False, 'green'), (660, 5))
+        else:
+            screen.blit(font.render("WHITE'S TURN", False, 'hot pink'), (660, 860))
+
         # Takes care of keyboard/mouse input
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if (event.type == pygame.QUIT):
                 running = False
+            
+            elif (event.type == pygame.MOUSEBUTTONDOWN):
+                if (event.button == 1): # 3 is right click
+                    selected = game.movePiece(turn)
+                    if (selected == None):
+                        turn = switchTurn(turn)
         
         pygame.display.flip()
     pygame.quit()
