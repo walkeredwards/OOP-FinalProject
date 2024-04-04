@@ -247,8 +247,9 @@ White_Rook2 = Rook("White_Rook_2", "White", 7, 7)
 white_pieces = [White_Pawn1, White_Pawn2, White_Pawn3, White_Pawn4, White_Pawn5, White_Pawn6, White_Pawn7, White_Pawn8,
                 White_Rook1, White_Knight1, White_Bishop1, White_Queen1, White_King, White_Bishop2, White_Knight2, White_Rook2]
 
+validMove = False
 
-class Board:    
+class Board:
     # Set up the squares on the board
     def make_board():
         # Make background color of screen black
@@ -306,6 +307,9 @@ class Board:
         w = (WIDTH - 800) // 2
         h = (HEIGHT - 800) // 2
 
+        global validMove
+        validMove = False
+
         pos_x, pos_y = pygame.mouse.get_pos()
         x, y = modifiedCoordinates(pos_x, pos_y)
 
@@ -334,7 +338,10 @@ class Board:
                 selected._x = x
                 selected._y = y
                 # Need to add function after piece is moved to capture piece if it moved to a square with an enemy
+                validMove = True
                 return None
+        
+        validMove = False
 
 
 def modifiedCoordinates(pos_x, pos_y) -> int:
@@ -384,8 +391,9 @@ if __name__ == "__main__":
             elif (event.type == pygame.MOUSEBUTTONDOWN):
                 if (event.button == 1): # 3 is right click
                     selected = game.movePiece(turn)
-                    if (selected == None):
+                    if (validMove):
                         turn = switchTurn(turn)
+
         
         pygame.display.flip()
     pygame.quit()
