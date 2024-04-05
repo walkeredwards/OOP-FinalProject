@@ -76,12 +76,15 @@ class Bishop():
 
             while path:
                 location_check = (self.x + (distance * moves[i][0]), self.y + (distance * moves[i][1]))
-                if (0 <= location_check[0] <= 7 and 0 <= location_check[1] <= 7):
-                    valid_moves.append(location_check)
-                    
-                    if (Board.checkEnemies(self._color, location_check[0], location_check[1])):
+                if (0 <= location_check[0] <= 7 and 0 <= location_check[1] <= 7):                    
+                    if (not Board.checkFriendly(self._color, location_check[0], location_check[1])):
+                        if (Board.checkEnemies(self._color, location_check[0], location_check[1])):
+                            valid_moves.append(location_check)
+                            path = False
+                        else:
+                            valid_moves.append(location_check)
+                    else:
                         path = False
-
                     distance += 1
                 else:
                     path = False
@@ -148,12 +151,15 @@ class Rook():
             
             while path:
                 location_check = (self.x + (distance * dirX), self.y + (distance * dirY))
-                if (0 <= location_check[0] <= 7 and 0 <= location_check[1] <= 7):
-                    valid_moves.append(location_check)
-                    
-                    if (Board.checkEnemies(self._color, location_check[0], location_check[1])):
+                if (0 <= location_check[0] <= 7 and 0 <= location_check[1] <= 7):                    
+                    if (not Board.checkFriendly(self._color, location_check[0], location_check[1])):
+                        if (Board.checkEnemies(self._color, location_check[0], location_check[1])):
+                            valid_moves.append(location_check)
+                            path = False
+                        else:
+                            valid_moves.append(location_check)
+                    else:
                         path = False
-
                     distance += 1
                 else:
                     path = False
@@ -201,7 +207,8 @@ class Knight():
             target = (self.x + moves[i][0], self.y + moves[i][1])
             
             if (0 <= target[0] <= 7 and 0 <= target[1] <= 7):
-                valid_moves.append(target)
+                if (not Board.checkFriendly(self._color, target[0], target[1])):
+                    valid_moves.append(target)
         
         return valid_moves
 
@@ -282,12 +289,15 @@ class Queen():
             
             while path:
                 location_check = (self.x + (distance * dirX), self.y + (distance * dirY))
-                if (0 <= location_check[0] <= 7 and 0 <= location_check[1] <= 7):
-                    valid_moves.append(location_check)
-                    
-                    if (Board.checkEnemies(self._color, location_check[0], location_check[1])):
+                if (0 <= location_check[0] <= 7 and 0 <= location_check[1] <= 7):                    
+                    if (not Board.checkFriendly(self._color, location_check[0], location_check[1])):
+                        if (Board.checkEnemies(self._color, location_check[0], location_check[1])):
+                            valid_moves.append(location_check)
+                            path = False
+                        else:
+                            valid_moves.append(location_check)
+                    else:
                         path = False
-
                     distance += 1
                 else:
                     path = False
@@ -329,14 +339,13 @@ class King():
         """ Returns list with allowed squares piece can move to."""
         valid_moves = []
         # all 8 possible moves
-        moves = [(1, -1), (1, 0), (1, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (-1, -1)]
+        moves = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
         # check if valid
-        for i in range(8):
-            target = (self.x + moves[i][0], self.y + moves[i][1])
-            
-            if (0 <= target[0] <= 7 and 0 <= target[1] <= 7):
-                valid_moves.append(target)
-        
+        for move in moves:
+            target = (self.x + move[0], self.y + move[1])
+            if (0 <= target[0] <= 7 and 0 <= target[1] <= 7):                    
+                if (not Board.checkFriendly(self._color, target[0], target[1])):
+                    valid_moves.append(target)
         return valid_moves
 
 
@@ -381,9 +390,9 @@ class Pawn():
         """
         valid_moves = []
         if (self._color == "white"):
-            target = (self.x + 0, self.y - 1)
+            target = (self.x + 0, self.y - 2)
         else:
-            target = (self.x + 0, self.y + 1)
+            target = (self.x + 0, self.y + 2)
             
         if (0 <= target[0] <= 7 and 0 <= target[1] <= 7):
             valid_moves.append(target)
@@ -396,6 +405,7 @@ class Pawn():
             if (move[0] == des_x and move[1] == des_y):
                 return True
         return False
+
 
 
 """ Initialize black pieces for player 1 and put them in a list in an order that 
