@@ -62,6 +62,9 @@ class Bishop():
         """ getter for Bishop's y coordinate"""
         return self._y
 
+    def checkMoves(self, des_x, des_y) -> bool:
+        return True
+
 
 class Rook():
     # Can move horizontally or vertically
@@ -87,6 +90,49 @@ class Rook():
         """ getter for Rook's y coordinate"""
         return self._y
 
+    def checkMoves(self, des_x, des_y) -> bool:
+        valid_moves = []
+        # Checks for the 4 directions
+        # Assigns the xy direction
+        for i in range(4):
+            # clear path
+            path = True
+            # distance traveled
+            distance = 1
+            if i == 0:
+                # up
+                dirX = 0
+                dirY = 1
+            elif i == 1:
+                # down
+                dirX = 0
+                dirY = -1
+            elif i == 2:
+                # left
+                dirX = -1
+                dirY = 0
+            else:
+                # right
+                dirX = 1
+                dirY = 0
+            
+            while path:
+                location_check = (self.x + (distance * dirX), self.y + (distance * dirY))
+                if (0 <= location_check[0] <= 7 and 0 <= location_check[1] <= 7):
+                    valid_moves.append(location_check)
+                    
+                    if (Board.checkEnemies(self._color, location_check[0], location_check[1])):
+                        path = False
+
+                    distance += 1
+                else:
+                    path = False
+
+        for move in valid_moves:
+            if (move[0] == des_x and move[1] == des_y):
+                return True
+        return False
+
 
 class Knight():
     # Can move in an L shape (e.g. up/down 2, over 1)
@@ -111,6 +157,9 @@ class Knight():
     def y(self) -> int:
         """ getter for Knight's y coordinate"""
         return self._y
+    
+    def checkMoves(self, des_x, des_y) -> bool:
+        return True
 
 
 class Queen():
@@ -138,15 +187,74 @@ class Queen():
         return self._y
     #def check():
 
+    def checkMoves(self, des_x, des_y) -> bool:
+        valid_moves = []
+        # Checks for the 4 directions
+        # Assigns the xy direction
+        for i in range(8): 
+            # clear path
+            path = True
+            # distance traveled
+            distance = 1
+            if i == 0:
+                # up
+                dirX = 0
+                dirY = 1
+            elif i == 1:
+                # down
+                dirX = 0
+                dirY = -1
+            elif i == 2:
+                # left
+                dirX = -1
+                dirY = 0 
+            elif i == 3:
+                # right
+                dirX = 1
+                dirY = 0
+            elif i == 4:
+                # diags NE
+                dirX = 1
+                dirY = 1
+            elif i == 5:
+                # diags SE
+                dirX = 1
+                dirY = -1 
+            elif i == 6:
+                # diags SW
+                dirX = -1
+                dirY = -1
+            else:
+                # diags NW
+                dirX = -1
+                dirY = 1
+            
+            while path:
+                location_check = (self.x + (distance * dirX), self.y + (distance * dirY))
+                if (0 <= location_check[0] <= 7 and 0 <= location_check[1] <= 7):
+                    valid_moves.append(location_check)
+                    
+                    if (Board.checkEnemies(self._color, location_check[0], location_check[1])):
+                        path = False
+
+                    distance += 1
+                else:
+                    path = False
+
+        for move in valid_moves:
+            if (move[0] == des_x and move[1] == des_y):
+                return True
+        return False
 
 class King():
     # Can only move to one of the 8 squares directly surrounding it
-    def __init__(self, name: str, color: str, x: int, y: int) -> None:
+    def __init__(self, name: str, color: str, x: int, y: int, hasMoved: bool) -> None:
         self._name = name
         self._color = color
         self._image = pygame.transform.scale(pygame.image.load('images/' + color + '/king.png'), (90, 90))
         self._x = x
         self._y = y
+        self._hasMoved = hasMoved
 
     @property
     def name(self) -> str:
@@ -162,6 +270,23 @@ class King():
     def y(self) -> int:
         """ getter for King's y coordinate"""
         return self._y
+
+    def checkMoves(self, des_x, des_y) -> bool:
+        valid_moves = []
+        # all 8 possible moves
+        moves = [(1, -1), (1, 0), (1, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (-1, -1)]
+        # check if valid
+        for i in range(8):
+            target = (self.x + moves[i][0], self.y + moves[i][1])
+            
+            if (0 <= target[0] <= 7 and 0 <= target[1] <= 7):
+                valid_moves.append(target)
+
+        for move in valid_moves:
+            if (move[0] == des_x and move[1] == des_y):
+                return True
+        return False
+
 
 class Pawn():
     # Can move 2 spaces forward on first move, but only 1 space after.
@@ -198,6 +323,8 @@ class Pawn():
     #def promotion():
         """ If pawn reaches end of board, player can promote to piece of choosing."""
 
+    def checkMoves(self, des_x, des_y) -> bool:
+        return True
 
 """ Initialize black pieces for player 1 and put them in a list in an order that 
     corresponds to their starting locations on the board"""
@@ -206,7 +333,7 @@ Black_Rook1 = Rook("Black_Rook_1", "black", 0, 0)
 Black_Knight1 = Knight("Black_Knight_1", "black", 1, 0)
 Black_Bishop1 = Bishop("Black_Bishop_1", "black", 2, 0)
 Black_Queen1 = Queen("Black_Queen_1", "black", 3, 0)
-Black_King = King("Black_King", "black", 4, 0)
+Black_King = King("Black_King", "black", 4, 0, False)
 Black_Bishop2 = Bishop("Black_Bishop_2", "black", 5, 0)
 Black_Knight2 = Knight("Black_Knight_2", "black", 6, 0)
 Black_Rook2 = Rook("Black_Rook_2", "black", 7, 0)
@@ -239,7 +366,7 @@ White_Rook1 = Rook("White_Rook_1", "White", 0, 7)
 White_Knight1 = Knight("White_Knight_1", "White", 1, 7)
 White_Bishop1 = Bishop("White_Bishop_1", "White", 2, 7)
 White_Queen1 = Queen("White_Queen_1", "White", 3, 7)
-White_King = King("White_King", "White", 4, 7)
+White_King = King("White_King", "White", 4, 7, False)
 White_Bishop2 =Bishop("White_Bishop_2", "White", 5, 7)
 White_Knight2 = Knight("White_Knight_2", "White", 6, 7)
 White_Rook2 = Rook("White_Rook_2", "White", 7, 7)
@@ -247,6 +374,7 @@ White_Rook2 = Rook("White_Rook_2", "White", 7, 7)
 white_pieces = [White_Pawn1, White_Pawn2, White_Pawn3, White_Pawn4, White_Pawn5, White_Pawn6, White_Pawn7, White_Pawn8,
                 White_Rook1, White_Knight1, White_Bishop1, White_Queen1, White_King, White_Bishop2, White_Knight2, White_Rook2]
 
+# Bool to check if a valid move has been made
 validMove = False
 
 class Board:
@@ -287,7 +415,7 @@ class Board:
             screen.blit(piece._image, (w + piece.x * 100, h + piece.y * 100))
 
 
-    def checkSquare(turn: str, x: int, y: int) -> bool:
+    def checkFriendly(turn: str, x: int, y: int) -> bool:
         """ Returns true if square is occupied by piece of same color."""
         if (turn == "black"):
             for piece in black_pieces:
@@ -300,6 +428,19 @@ class Board:
         
         return False
 
+
+    def checkEnemies(turn: str, x: int, y: int) -> bool:
+        """ Returns true if square is occupied by piece of opposite color."""
+        if (turn == "black"):
+            for piece in white_pieces:
+                if (piece.x == x and piece.y == y):
+                    return True
+        else:
+            for piece in black_pieces:
+                if (piece.x == x and piece.y == y):
+                    return True
+        
+        return False
 
     # Move this to a class later
     def movePiece(turn: str):
@@ -318,7 +459,7 @@ class Board:
             if (turn == "black"):
                 for piece in black_pieces:
                     if (piece.x == x and piece.y == y):
-                        print(piece._name)
+                        print(f"{piece._name}, ({piece.x}, {piece.y})")
                         square = (x, y)
                         pygame.draw.rect(screen, 'green', [w + x * 100, h + y * 100, 100, 100])
                         return piece
@@ -326,7 +467,7 @@ class Board:
             else: # If it is white turn
                 for piece in white_pieces:
                     if (piece.x == x and piece.y == y):
-                        print(piece._name)
+                        print(f"{piece._name}, ({piece.x}, {piece.y})")
                         square = (x, y)
                         pygame.draw.rect(screen, 'hot pink', [w + x * 100, h + y * 100, 100, 100])
                         return piece
@@ -334,13 +475,14 @@ class Board:
         # If a piece has been selected
         else:
             # Need add function make sure selected square to move piece to is a valid move
-            if (not Board.checkSquare(turn, x, y)):
+            if (not Board.checkFriendly(turn, x, y) and selected.checkMoves(x, y)):
+                # Call piece's check move, passing in
                 selected._x = x
                 selected._y = y
+                print(f"Moved to ({x}, {y})")
                 # Need to add function after piece is moved to capture piece if it moved to a square with an enemy
                 validMove = True
                 return None
-        
         validMove = False
 
 
