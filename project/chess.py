@@ -62,8 +62,37 @@ class Bishop():
         """ getter for Bishop's y coordinate"""
         return self._y
 
-    def checkMoves(self, des_x, des_y) -> bool:
-        return True
+    def checkMoves(self, des_x, des_y) -> list:
+        """ Returns list with allowed squares piece can move to."""
+        valid_moves = []
+        # Checks for the 4 directions
+        moves = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
+        # check if valid
+        for i in range(4):
+            # clear path
+            path = True
+            # distance traveled
+            distance = 1
+
+            while path:
+                location_check = (self.x + (distance * moves[i][0]), self.y + (distance * moves[i][1]))
+                if (0 <= location_check[0] <= 7 and 0 <= location_check[1] <= 7):
+                    valid_moves.append(location_check)
+                    
+                    if (Board.checkEnemies(self._color, location_check[0], location_check[1])):
+                        path = False
+
+                    distance += 1
+                else:
+                    path = False
+        
+        return valid_moves
+
+    def canMove(self, valid_moves, des_x, des_y) -> bool:
+        for move in valid_moves:
+            if (move[0] == des_x and move[1] == des_y):
+                return True
+        return False
 
 
 class Rook():
@@ -90,7 +119,8 @@ class Rook():
         """ getter for Rook's y coordinate"""
         return self._y
 
-    def checkMoves(self, des_x, des_y) -> bool:
+    def checkMoves(self, des_x, des_y) -> list:
+        """ Returns list with allowed squares piece can move to."""
         valid_moves = []
         # Checks for the 4 directions
         # Assigns the xy direction
@@ -127,7 +157,10 @@ class Rook():
                     distance += 1
                 else:
                     path = False
+        
+        return valid_moves
 
+    def canMove(self, valid_moves, des_x, des_y) -> bool:
         for move in valid_moves:
             if (move[0] == des_x and move[1] == des_y):
                 return True
@@ -158,8 +191,25 @@ class Knight():
         """ getter for Knight's y coordinate"""
         return self._y
     
-    def checkMoves(self, des_x, des_y) -> bool:
-        return True
+    def checkMoves(self, des_x, des_y) -> list:
+        """ Returns list with allowed squares piece can move to."""
+        valid_moves = []
+        # all 8 possible moves
+        moves = [(-2, -1), (-1, -2), (-2, 1), (-1, 2), (1, -2), (2, -1), (1, 2), (2, 1)]
+        # check if valid
+        for i in range(8):
+            target = (self.x + moves[i][0], self.y + moves[i][1])
+            
+            if (0 <= target[0] <= 7 and 0 <= target[1] <= 7):
+                valid_moves.append(target)
+        
+        return valid_moves
+
+    def canMove(self, valid_moves, des_x, des_y) -> bool:
+        for move in valid_moves:
+            if (move[0] == des_x and move[1] == des_y):
+                return True
+        return False
 
 
 class Queen():
@@ -187,7 +237,8 @@ class Queen():
         return self._y
     #def check():
 
-    def checkMoves(self, des_x, des_y) -> bool:
+    def checkMoves(self, des_x, des_y) -> list:
+        """ Returns list with allowed squares piece can move to."""
         valid_moves = []
         # Checks for the 4 directions
         # Assigns the xy direction
@@ -240,7 +291,10 @@ class Queen():
                     distance += 1
                 else:
                     path = False
+        
+        return valid_moves
 
+    def canMove(self, valid_moves, des_x, des_y) -> bool:
         for move in valid_moves:
             if (move[0] == des_x and move[1] == des_y):
                 return True
@@ -271,7 +325,8 @@ class King():
         """ getter for King's y coordinate"""
         return self._y
 
-    def checkMoves(self, des_x, des_y) -> bool:
+    def checkMoves(self, des_x, des_y) -> list:
+        """ Returns list with allowed squares piece can move to."""
         valid_moves = []
         # all 8 possible moves
         moves = [(1, -1), (1, 0), (1, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (-1, -1)]
@@ -281,7 +336,11 @@ class King():
             
             if (0 <= target[0] <= 7 and 0 <= target[1] <= 7):
                 valid_moves.append(target)
+        
+        return valid_moves
 
+
+    def canMove(self, valid_moves, des_x, des_y) -> bool:
         for move in valid_moves:
             if (move[0] == des_x and move[1] == des_y):
                 return True
@@ -312,19 +371,32 @@ class Pawn():
         """ getter for Pawn's y coordinate"""
         return self._y
 
-    def moves(self) -> None:
-        if (hasMoved == False):
-            # Can move two spots forward it piece has not moved yet.
-            print("False")
-        else:
-            # Can only move one spot forward once pawn has already moved.
-            print("True")
-
-    #def promotion():
+    def promotion() -> None:
         """ If pawn reaches end of board, player can promote to piece of choosing."""
 
-    def checkMoves(self, des_x, des_y) -> bool:
-        return True
+    def checkMoves(self, des_x, des_y) -> list:
+        """ Checks if attempted move is within the allowed squares
+        Can move 2 spots forward if it hasn't been moved, otherwise can only move 1 spot forward.
+        Can only capture top left or top right, can't move/capture if enemy piece is directly in front of it.
+        """
+        valid_moves = []
+        if (self._color == "white"):
+            target = (self.x + 0, self.y - 1)
+        else:
+            target = (self.x + 0, self.y + 1)
+            
+        if (0 <= target[0] <= 7 and 0 <= target[1] <= 7):
+            valid_moves.append(target)
+
+        return valid_moves
+
+
+    def canMove(self, valid_moves, des_x, des_y) -> bool:
+        for move in valid_moves:
+            if (move[0] == des_x and move[1] == des_y):
+                return True
+        return False
+
 
 """ Initialize black pieces for player 1 and put them in a list in an order that 
     corresponds to their starting locations on the board"""
@@ -442,6 +514,17 @@ class Board:
         
         return False
 
+    def highlightMoves(valid_moves, turn):
+        """ Function that highlights the possible squares a piece is allowed to move to."""
+        w = (WIDTH - 800) // 2
+        h = (HEIGHT - 800) // 2
+
+        for move in valid_moves:
+            if(turn == "black"):
+                pygame.draw.rect(screen, 'green', [w + move[0] * 100, h + move[1] * 100, 100, 100], 3)
+            else:
+                pygame.draw.rect(screen, 'hot pink', [w + move[0] * 100, h + move[1] * 100, 100, 100], 3)
+
     # Move this to a class later
     def movePiece(turn: str):
         """ Function that handles clicking on a piece and moving it to another square."""
@@ -456,11 +539,13 @@ class Board:
 
         # If no piece is selected
         if (selected == None):
-            if (turn == "black"):
+            if (turn == "black"): # If it is black turn
                 for piece in black_pieces:
                     if (piece.x == x and piece.y == y):
                         print(f"{piece._name}, ({piece.x}, {piece.y})")
                         square = (x, y)
+                        moves = piece.checkMoves(x, y)
+                        Board.highlightMoves(moves, turn)
                         pygame.draw.rect(screen, 'green', [w + x * 100, h + y * 100, 100, 100])
                         return piece
 
@@ -469,19 +554,25 @@ class Board:
                     if (piece.x == x and piece.y == y):
                         print(f"{piece._name}, ({piece.x}, {piece.y})")
                         square = (x, y)
+                        moves = piece.checkMoves(x, y)
+                        Board.highlightMoves(moves, turn)
                         pygame.draw.rect(screen, 'hot pink', [w + x * 100, h + y * 100, 100, 100])
                         return piece
         
         # If a piece has been selected
         else:
             # Need add function make sure selected square to move piece to is a valid move
-            if (not Board.checkFriendly(turn, x, y) and selected.checkMoves(x, y)):
+            moves = selected.checkMoves(x, y)
+            if (not Board.checkFriendly(turn, x, y) and selected.canMove(moves, x, y)):
                 # Call piece's check move, passing in
                 selected._x = x
                 selected._y = y
                 print(f"Moved to ({x}, {y})")
                 # Need to add function after piece is moved to capture piece if it moved to a square with an enemy
                 validMove = True
+                return None
+            else:
+                game.make_board()
                 return None
         validMove = False
 
@@ -511,13 +602,14 @@ if __name__ == "__main__":
     running = True
     selected = None
     turn = "white"
+
+    # Create 8 by 8 board and add pieces onto the board
+    game = Board
+    game.make_board()
+    game.setup_pieces()
+
     while running:
         timer.tick(fps)
-
-        # Create 8 by 8 board and add pieces onto the board
-        game = Board
-        game.make_board()
-        game.setup_pieces()
 
         """ Move later to function to put on screen for whoever's turn it is"""
         if(turn == "black"):
@@ -535,7 +627,8 @@ if __name__ == "__main__":
                     selected = game.movePiece(turn)
                     if (validMove):
                         turn = switchTurn(turn)
-
+                        game.make_board()
+                game.setup_pieces()
         
         pygame.display.flip()
     pygame.quit()
