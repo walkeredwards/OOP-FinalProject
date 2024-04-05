@@ -31,31 +31,37 @@ class Pawn():
     def get_location(self):
         return self._location
         
-    def checkPawn(self, new_location) -> bool:
-        if self._color == "white":
+    def checkPawn(self) -> list:
+        possible_moves = []
+        if self._color == "White":
             friendly_locations = get_white_locations()
             enemy_locations = get_black_locations()
+            if (self._location[0], self._location[1] + 1) not in friendly_locations and \
+                    (self._location[0], self._location[1] + 1) not in enemy_locations and self._location[1] < 7:
+                possible_moves.append((self._location[0], self._location[1] + 1))
+            if (self._location[0], self._location[1] + 2) not in friendly_locations and \
+                    (self._location[0], self._location[1] + 2) not in enemy_locations and self._location[1] == 1:
+                possible_moves.append((self._location[0], self._location[1] + 2))
+            if (self._location[0] + 1, self._location[1] + 1) in enemy_locations:
+                possible_moves.append((self._location[0] + 1, self._location[1] + 1))
+            if (self._location[0] - 1, self._location[1] + 1) in enemy_locations:
+                possible_moves.append((self._location[0] - 1, self._location[1] + 1))
         else:
             friendly_locations = get_black_locations()
             enemy_locations = get_white_locations()
+            if (self._location[0], self._location[1] - 1) not in enemy_locations and \
+                    (self._location[0], self._location[1] - 1) not in friendly_locations and self._location[1] > 0:
+                possible_moves.append((self._location[0], self._location[1] - 1))
+            if (self._location[0], self._location[1] - 2) not in enemy_locations and \
+                    (self._location[0], self._location[1] - 2) not in friendly_locations and self._location[1] == 6:
+                possible_moves.append((self._location[0], self._location[1] - 2))
+            if (self._location[0] + 1, self._location[1] - 1) in enemy_locations:
+                possible_moves.append((self._location[0] + 1, self._location[1] - 1))
+            if (self._location[0] - 1, self._location[1] - 1) in enemy_locations:
+                possible_moves.append((self._location[0] - 1, self._location[1] - 1))
+        return possible_moves
+        
 
-        if new_location in friendly_locations:
-            return False
-        if (new_location[0] == self._location[0] + 1  or new_location[0] == self._location[0] -1) \
-            and new_location[1] == self._location[1] + 1 and new_location in enemy_locations:
-            return True
-              
-        if new_location[0] == self._location[0] and new_location[1] == self._location[1] + 1:
-            
-            if new_location not in friendly_locations and new_location not in enemy_locations:
-                return True
-            else:
-                return False
-        if self._location[1] == 1 and new_location[1] == 3 and new_location[0] == self._location[0]:
-            if (self._location[0], 2) not in friendly_locations and (self._location[0], 2) not in enemy_locations and \
-            (self._location[0], 3) not in friendly_locations and (self._location[0], 3) not in enemy_locations:
-                return True
-        return False
 
 
 
@@ -74,52 +80,39 @@ class Bishop():
         return self._location
     
     def check_bishop(self, new_location):
-        if self._color == 'white':
+        possible_moves = []
+        if self._color == 'White':
             enemy_locations = get_black_locations()
             friendly_locations = get_white_locations()
         else:
             friendly_locations = get_black_locations()
             enemy_locations = get_white_locations()
+        for i in range(4):
+            path = True
+            chain = 1
+            if i == 0:
+                x = 1
+                y = -1
+            elif i == 1:
+                x = -1
+                y = -1
+            elif i == 2:
+                x = 1
+                y = 1
+            else:
+                x = -1
+                y = 1
+            while path:
+                if (self._location[0] + (chain * x), self._location[1] + (chain * y)) not in friendly_locations and \
+                        0 <= self._location[0] + (chain * x) <= 7 and 0 <= self._location[1] + (chain * y) <= 7:
+                    possible_moves.append((self._location[0] + (chain * x), self._location[1] + (chain * y)))
+                    if (self._location[0] + (chain * x), self._location[1] + (chain * y)) in enemy_locations:
+                        path = False
+                    chain += 1
+                else:
+                    path = False
+        return possible_moves
 
-        # Calculate the difference in coordinates between the current position and the new move
-        dx = new_location[0] - self._location[0]
-        dy = new_location[1] - self._location[1]
-
-        # Check if the move is a valid diagonal move
-        if abs(dx) != abs(dy):
-            return False  # Not a valid diagonal move
-        
-        # Determine the direction of movement (up-left, up-right, down-left, down-right)
-        if dx > 0:
-            direction_x = 1 
-        else:
-            direction_x = -1
-        if dy > 0:
-            direction_y = 1
-        else:
-            direction_y = -1
-
-        # Iterate along the diagonal path until reaching the new move or the edge of the board
-        current_x = self._location[0]
-        current_y = self._location[1]
-        while current_x != new_location[0] and current_y != new_location[1]:
-            current_x += direction_x
-            current_y += direction_y
-            
-            # Check if the new position is within the board boundaries
-            if not (0 <= current_x <= 7 and 0 <= current_y <= 7):
-                return False  # Out of board
-            
-            # Check if the new position is occupied by a friendly piece
-            if (current_x, current_y) in friendly_locations:
-                return False  # Path is blocked by friendly piece
-            
-            # Check if the new position is occupied by an enemy piece
-            if (current_x, current_y) in enemy_locations:
-                return True  # Valid move, can capture enemy piece
-          
-        # Reached the requested location without encountering any pieces
-        return True if new_location not in friendly_locations else False  # Check if the requested location is open or occupied by an enemy piece
 
 
 
@@ -135,32 +128,19 @@ class Knight():
         return self._location
     
     def check_knight(self, new_location):
-        if self._color == 'white':
+        possible_moves = []
+        if self._color == 'White':
             enemy_locations = get_black_locations()
             friendly_locations = get_white_locations()
         else:
             friendly_locations = get_black_locations()
             enemy_locations = get_white_locations()
-
-        # Calculate the difference in coordinates between the current position and the new move
-        dx = abs(new_location[0] - self._location[0])
-        dy = abs(new_location[1] - self._location[1])
-
-        # Check if the move is a valid knight move (L shape)
-        if (dx, dy) not in [(1, 2), (2, 1)]:
-            return False  # Not a valid knight move
-
-        # Check if the new position is within the board boundaries
-        if not (0 <= new_location[0] <= 7 and 0 <= new_location[1] <= 7):
-            return False  # Out of board boundaries, invalid move
-
-        # Check if the new position is occupied by a friendly piece
-        if new_location in friendly_locations:
-            return False  # Cannot move to a square occupied by a friendly piece
-
-        # Check if the new position is occupied by an enemy piece or is open
-        if new_location in enemy_locations or new_location not in friendly_locations:
-            return True
+        targets = [(1, 2), (1, -2), (2, 1), (2, -1), (-1, 2), (-1, -2), (-2, 1), (-2, -1)]
+        for i in range(8):
+            target = (self._location[0] + targets[i][0], self._location[1] + targets[i][1])
+            if target not in friendly_locations and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
+                possible_moves.append(target)
+        return possible_moves
 
 
 
