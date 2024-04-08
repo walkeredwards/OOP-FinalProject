@@ -33,7 +33,7 @@ class Pawn():
         
     def checkPawn(self) -> list:
         possible_moves = []
-        if self._color == "White":
+        if self._color == "white":
             friendly_locations = get_white_locations()
             enemy_locations = get_black_locations()
             if (self._location[0], self._location[1] + 1) not in friendly_locations and \
@@ -62,7 +62,7 @@ class Pawn():
         return possible_moves
     
     def promotion(self) -> None:
-        if self._color == "White":
+        if self._color == "white":
             white_pieces.remove(self)
             pygames_choice = input() #need help w pygame initalize
             if pygames_choice == "queen":
@@ -77,7 +77,7 @@ class Pawn():
             elif pygames_choice == "knight":
                 pawn_knight = Knight("White", self._location)
                 white_pieces.append(pawn_knight)
-                
+
         else:
             black_pieces.remove(self)
             pygames_choice = input() #need help w pygame initalize
@@ -111,7 +111,7 @@ class Bishop():
     
     def check_bishop(self):
         possible_moves = []
-        if self._color == 'White':
+        if self._color == 'white':
             enemy_locations = get_black_locations()
             friendly_locations = get_white_locations()
         else:
@@ -157,7 +157,7 @@ class Knight():
     def get_location(self):
         return self._location
     
-    def check_knight(self, new_location):
+    def check_knight(self):
         possible_moves = []
         if self._color == 'White':
             enemy_locations = get_black_locations()
