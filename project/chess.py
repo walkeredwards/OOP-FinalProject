@@ -60,13 +60,43 @@ class Pawn():
             if (self._location[0] - 1, self._location[1] - 1) in enemy_locations:
                 possible_moves.append((self._location[0] - 1, self._location[1] - 1))
         return possible_moves
-        
+    
+    def promotion(self) -> None:
+        if self._color == "White":
+            white_pieces.remove(self)
+            pygames_choice = input() #need help w pygame initalize
+            if pygames_choice == "queen":
+                pawn_queen = Queen("White", self._location)
+                white_pieces.append(pawn_queen)
+            elif pygames_choice == "rook":
+                pawn_rook = Rook("White", self._location)
+                white_pieces.append(pawn_rook)
+            elif pygames_choice == "bishop":
+                pawn_bishop = Bishop("White", self._location)
+                white_pieces.append(pawn_bishop)
+            elif pygames_choice == "knight":
+                pawn_knight = Knight("White", self._location)
+                white_pieces.append(pawn_knight)
+                
+        else:
+            black_pieces.remove(self)
+            pygames_choice = input() #need help w pygame initalize
+            if pygames_choice == "queen":
+                pawn_queen = Queen("black", self._location)
+                black_pieces.append(pawn_queen)
+            elif pygames_choice == "rook":
+                pawn_rook = Rook("black", self._location)
+                black_pieces.append(pawn_rook)
+            elif pygames_choice == "bishop":
+                pawn_bishop = Bishop("black", self._location)
+                black_pieces.append(pawn_bishop)
+            elif pygames_choice == "knight":
+                pawn_knight = Knight("black", self._location)
+                black_pieces.append(pawn_knight)
+            
 
 
 
-
-    #def promotion():
-        """ If pawn reaches end of board, player can promote to piece of choosing"""
 
 
 class Bishop():
@@ -79,7 +109,7 @@ class Bishop():
     def get_location(self):
         return self._location
     
-    def check_bishop(self, new_location):
+    def check_bishop(self):
         possible_moves = []
         if self._color == 'White':
             enemy_locations = get_black_locations()
