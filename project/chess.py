@@ -14,19 +14,19 @@ pygame.init()
 WIDTH = 1600
 HEIGHT = 900
 
-# creates pygame screen
-screen = pygame.display.set_mode([WIDTH, HEIGHT])
-pygame.display.set_caption("Chess")
-# sets fps
-timer = pygame.time.Clock()
-fps = 60
+def main():
+    """main game setup and loop"""
+    # creates pygame screen
+    screen = pygame.display.set_mode([WIDTH, HEIGHT])
+    pygame.display.set_caption("Chess")
+    # sets fps
+    timer = pygame.time.Clock()
+    fps = 60
 
-# creates player class
-player_1 = Player("white")
-player_2 = Player("black")
+    # creates player class
+    player_1 = Player("white")
+    player_2 = Player("black")
 
-# Main function with game loop
-if __name__ == "__main__":
     # setup game
     running: bool = True
     turn: str = "white"
@@ -38,6 +38,7 @@ if __name__ == "__main__":
     while running:
         timer.tick(fps)
         screen.fill("black")
+
         # Create 8 by 8 board and peices
         game.make_board(screen)
         game.highlight_selected(player_1.selected_peice_info[0], screen, turn)
@@ -51,11 +52,11 @@ if __name__ == "__main__":
                 # gets coord of player click
                 click = player_1.click(WIDTH, HEIGHT)
 
-                if player_1.selected_peice_info[0] is None and player_1.selected_peice_info[1] is None:
-                    if game.turn(turn, click):
-                        # if no peice is selected then check if peice is on coord
-                        # if so then assign to player select
-                        player_1.selected_peice_info = game.select(turn, click)
+                if player_1.selected_peice_info[0] is None and \
+                    player_1.selected_peice_info[1] is None:
+
+                    # takes location and checks if peice is there
+                    player_1.selected_peice_info = game.select(turn, click)
                 else:
                     # if player has selected peice then check avalible moves
                     player_move = game.move(turn, player_1.selected_peice_info[1], click)
@@ -72,11 +73,11 @@ if __name__ == "__main__":
                 # gets coord of player click
                 click = player_2.click(WIDTH, HEIGHT)
 
-                if player_2.selected_peice_info[0] is None and player_2.selected_peice_info[1] is None:
-                    if game.turn(turn, click):
-                        # if no peice is selected then check if peice is on coord
-                        # if so then assign to player select
-                        player_2.selected_peice_info = game.select(turn, click)
+                if player_2.selected_peice_info[0] is None and \
+                    player_2.selected_peice_info[1] is None:
+
+                    # takes location and checks if peice is there
+                    player_2.selected_peice_info = game.select(turn, click)
 
                 else:
                     # if player has selected peice then check avalible moves
@@ -95,3 +96,8 @@ if __name__ == "__main__":
 
         pygame.display.flip()
     pygame.quit()
+
+
+# Main function with game loop
+if __name__ == "__main__":
+    main()

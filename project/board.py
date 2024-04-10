@@ -38,15 +38,15 @@ class Board():
             width (int): width of screen
             height (int): height of screen
         """
+        self._width: int = width
+        self._heght:int = height
         self._white_pieces: list = []
         self._black_pieces: list = []
         self._white_location: list = []
         self._black_location: list = []
-        self._width: int = width
-        self._heght:int = height
         self._captured: list = []
         self._old_location = None
-        self._new_location = None
+        self._last_peice_moved = None
         self._black_king = None
         self._white_king = None
         self._in_check = None
@@ -75,8 +75,10 @@ class Board():
         black_pawn7 = Pawn("black", (6, 1))
         black_pawn8 = Pawn("black", (7, 1))
 
-        self._black_pieces = [black_pawn1, black_pawn2, black_pawn3, black_pawn4, black_pawn5, black_pawn6, black_pawn7, black_pawn8,
-                        black_rook1, black_knight1, black_bishop1, black_queen, black_king, black_bishop2, black_knight2, black_rook2]
+        self._black_pieces = [black_pawn1, black_pawn2, black_pawn3, black_pawn4,
+                              black_pawn5, black_pawn6, black_pawn7, black_pawn8,
+                              black_rook1, black_knight1, black_bishop1, black_queen,
+                              black_king, black_bishop2, black_knight2, black_rook2]
         self._black_king = black_king
         # Initialize white pieces for player 1 and put them in the peices list
         # Row 1
@@ -98,8 +100,10 @@ class Board():
         white_knight2 = Knight("white", (6, 7))
         white_rook2 = Rook("white", (7, 7))
 
-        self._white_pieces = [white_pawn1, white_pawn2, white_pawn3, white_pawn4, white_pawn5, white_pawn6, white_pawn7, white_pawn8,
-                        white_rook1, white_knight1, white_bishop1, white_queen, white_king, white_bishop2, white_knight2, white_rook2]
+        self._white_pieces = [white_pawn1, white_pawn2, white_pawn3, white_pawn4,
+                              white_pawn5, white_pawn6, white_pawn7, white_pawn8,
+                              white_rook1, white_knight1, white_bishop1, white_queen,
+                              white_king, white_bishop2, white_knight2, white_rook2]
         self._white_king = white_king
         # updates locations for all peices
         self.update_locations()
@@ -123,12 +127,48 @@ class Board():
                 else:
                     # Odd squares will be white
                     pygame.draw.rect(screen, 'white', [w + col * 100, h + row * 100, 100, 100])
-        if self._new_location is not None:
-            pygame.draw.rect(screen, (176, 255, 248), [w + self._old_location[0] * 100, h + self._old_location[1] * 100, 100, 100])
-            pygame.draw.rect(screen, (176, 255, 248), [w + self._new_location[0] * 100, h + self._new_location[1] * 100, 100, 100])
+        if self._last_peice_moved is not None:
+            pygame.draw.rect(screen, (176, 255, 248), [w + self._old_location[0] * 100,
+                                                       h + self._old_location[1] * 100, 100, 100])
+            pygame.draw.rect(screen, (176, 255, 248), [w + self._last_peice_moved.location[0] * 100,
+                                                       h + self._last_peice_moved.location[1] * 100,
+                                                       100, 100])
 
         if self._in_check is not None:
-            pygame.draw.rect(screen, "red", [w + self._in_check.location[0] * 100, h + self._in_check.location[1] * 100, 100, 100])
+            pygame.draw.rect(screen, "red", [w + self._in_check.location[0] * 100,
+                                             h + self._in_check.location[1] * 100, 100, 100])
+
+    def highlight_selected(self, selected_peice, screen, turn: str) -> None:
+        """if player selected peice is not none
+        then highlight all possible locations it can move to 
+
+        Args:
+            selected_peice (tuple): player selected peice
+            screen (_type_): screen to display
+        """
+        if selected_peice is not None:
+            w = (self._width - 800) // 2
+            h = (self._heght - 800) // 2
+
+            moves = []
+            if isinstance(selected_peice, King):
+                moves = selected_peice.possible_moves(self._black_location, self._white_location,
+                                                      self._black_pieces, self._white_pieces, turn)
+            else:
+                moves = selected_peice.possible_moves(self._black_location, self._white_location)
+                if self._in_check is not None:
+                    selected_moves = moves
+                    moves = []
+                    block_moves = self.in_check_block(turn)
+                    for coord in selected_moves:
+                        if coord  in block_moves:
+                            moves.append(coord)
+
+            moves.append(selected_peice.location)
+
+            for tile in moves:
+                pygame.draw.rect(screen, (161, 255, 186),
+                                 [w + tile[0] * 100, h + tile[1] * 100, 100, 100])
 
     def draw_pieces(self, screen):
         """draws the pieces
@@ -159,13 +199,15 @@ class Board():
                     if white_capture_count < 7:
                         screen.blit(peice._image, (10 + white_capture_count * 35, h + 0 * 100))
                     else:
-                        screen.blit(peice._image, (10 + (white_capture_count -7) * 35, (h *1.5) + 0 * 100))
+                        screen.blit(peice._image, (10 + (white_capture_count -7) * 35,
+                                                   (h *1.5) + 0 * 100))
                     white_capture_count += 1
                 elif peice.color == "black":
                     if black_capture_count < 7:
                         screen.blit(peice._image, (10 + black_capture_count * 35, h + 7 * 100))
                     else:
-                        screen.blit(peice._image, (10 + (black_capture_count - 7) * 35, (h *1.5) + 7 * 100))
+                        screen.blit(peice._image, (10 + (black_capture_count - 7) * 35,
+                                                   (h *1.5) + 7 * 100))
                     black_capture_count += 1
 
     def update_locations(self) -> None:
@@ -188,29 +230,6 @@ class Board():
 
         self._black_location = locations
 
-    def turn(self, player_color: str, coord: tuple) -> bool:
-        """finds if a coordanate contains a peice from the given color
-
-        Args:
-            player_color (str): color of player
-            coord (tuple): location to be checked
-
-        Returns:
-            bool: true if a peice of given color is in coord
-        """
-        valid = False
-
-        if player_color == "white":
-            # checks white locations
-            if coord in self._white_location:
-                valid = True
-        elif player_color == "black":
-            # checks black locations
-            if coord in self._black_location:
-                valid = True
-
-        return valid
-
     def select(self, color: str, coord: tuple) -> tuple:
         """returns a peice infomation based on coord
 
@@ -232,6 +251,7 @@ class Board():
                 if coord == peice.location:
                     return (peice, index)
                 index += 1
+        return (None, None)
 
     def move(self, color: str, index: int, new_location: tuple) -> bool:
         """moves a peice
@@ -251,22 +271,34 @@ class Board():
             peice = self._white_pieces[index]
             if isinstance(peice, King):
                 last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location, self._black_pieces, self._white_pieces)
+                move = peice.move(new_location, self._black_location, self._white_location,
+                                  self._black_pieces, self._white_pieces)
+            elif self._in_check is not None:
+                last_location = peice.location
+                move = peice.move(new_location, self._black_location, self._white_location,
+                                  self.in_check_block(color))
             else:
                 last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location)
+                move = peice.move(new_location, self._black_location, self._white_location, None)
+
 
         elif color == "black":
             peice = self._black_pieces[index]
             if isinstance(peice, King):
                 last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location, self._black_pieces, self._white_pieces)
+                move = peice.move(new_location, self._black_location, self._white_location,
+                                  self._black_pieces, self._white_pieces)
+            elif self._in_check is not None:
+                last_location = peice.location
+                move = peice.move(new_location, self._black_location, self._white_location,
+                                  self.in_check_block(color))
             else:
                 last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location)
+                move = peice.move(new_location, self._black_location, self._white_location, None)
         if move:
             self._old_location = last_location
-            self._new_location = new_location
+            self._last_peice_moved = peice
+
             self.check_capture(color, new_location)
             self.update_locations()
 
@@ -274,8 +306,12 @@ class Board():
 
             if check and color == "white":
                 self._in_check = self._black_king
+                checkmate = self.check_checkmate("black")
+                if checkmate:
+                    self.end_game(color)
             elif check and color == "black":
                 self._in_check = self._white_king
+                checkmate = self.check_checkmate("white")
             else:
                 self._in_check = None
 
@@ -301,35 +337,108 @@ class Board():
                     self._white_pieces.remove(peice)
                     self._captured.append(peice)
 
-    def highlight_selected(self, selected_peice, screen, turn: str) -> None:
-        """if player selected peice is not none
-        then highlight all possible locations it can move to 
-
-        Args:
-            selected_peice (tuple): player selected peice
-            screen (_type_): screen to display
-        """
-        if selected_peice is not None:
-            w = (self._width - 800) // 2
-            h = (self._heght - 800) // 2
-
-            moves = []
-            if isinstance(selected_peice, King):
-                moves = selected_peice.possible_moves(self._black_location, self._white_location, self._black_pieces, self._white_pieces, turn)
-            else:
-                moves = selected_peice.possible_moves(self._black_location, self._white_location)
-            moves.append(selected_peice.location)
-
-            for tile in moves:
-                pygame.draw.rect(screen, (161, 255, 186), [w + tile[0] * 100, h + tile[1] * 100, 100, 100])
-
     def is_in_check(self, turn: str) -> bool:
         # checks tile if king is in check
         check = False
         # checkt the opposite king from the turn
         if turn == "white":
-            check = not self._black_king.is_safe(self._black_location, self._white_location, self._black_pieces, self._white_pieces, self._black_king.location)
+            check = not self._black_king.is_safe(self._black_location, self._white_location,
+                                                 self._black_pieces, self._white_pieces,
+                                                 self._black_king.location)
         else:
-            check = not self._white_king.is_safe(self._black_location, self._white_location, self._black_pieces, self._white_pieces, self._white_king.location)
+            check = not self._white_king.is_safe(self._black_location, self._white_location,
+                                                 self._black_pieces, self._white_pieces,
+                                                 self._white_king.location)
 
         return check
+
+    def in_check_block(self, turn: str) -> list:
+        attacking = self._last_peice_moved
+        block_tile = []
+        distance = 1
+        temp_coord = (0,0)
+        direction = (0,0)
+
+        if turn == "white":
+            king = self._white_king
+        else:
+            king = self._black_king
+
+        if not isinstance(attacking, Knight):
+            # find attaking location reletive to king ie attack direction n e s w, ne se sw nw
+            if attacking.location[0] > king.location[0]:
+                # to the right of king
+                if attacking.location[1] > king.location[1]:
+                    # attacker SE of king
+                    direction = (-1, -1)
+                elif attacking.location[1] < king.location[1]:
+                    # attacker NE of king
+                    direction = (-1, 1)
+                elif attacking.location[1] == king.location[1]:
+                    # attacking E of king
+                    direction = (-1, 0)
+
+            elif attacking.location[0] < king.location[0]:
+                # to the left of king
+                if attacking.location[1] > king.location[1]:
+                    # attacker SW of king
+                    direction = (1, -1)
+                elif attacking.location[1] < king.location[1]:
+                    # attacker NW of king
+                    direction = (1, 1)
+                elif attacking.location[1] == king.location[1]:
+                    # attacking W of king
+                    direction = (1, 0)
+
+            elif attacking.location[0] == king.location[0]:
+                # same row as king
+                if attacking.location[1] > king.location[1]:
+                    # attacking s of king
+                    direction = (0, -1)
+                elif attacking.location[1] < king.location[1]:
+                    # attacking n of king
+                    direction = (0, 1)
+
+            while temp_coord != king.location:
+                temp_coord = (attacking.location[0] + direction[0] * distance,
+                              attacking.location[1] + direction[1] * distance)
+                block_tile.append(temp_coord)
+                distance += 1
+
+        # adds attacking location for capture
+        block_tile.append(attacking.location)
+
+        return block_tile
+
+    def check_checkmate(self, color: str) -> bool:
+        king_can_move = False
+        can_block = False
+        block_tiles = self.in_check_block(color)
+
+        if color == "white":
+            friend = self._white_pieces
+        else:
+            friend = self._black_pieces
+
+        for peice in friend:
+            if not (can_block or king_can_move):
+                if isinstance(peice, King):
+                    moves = peice.possible_moves(self._black_location, self._white_location,
+                                                self._black_pieces, self._white_pieces, color)
+                    if len(moves) > 0:
+                        return False
+
+                else:
+                    moves = peice.possible_moves(self._black_location, self._white_location)
+                    if not (can_block or king_can_move):
+                        for coord in moves:
+                            if coord in block_tiles:
+                                return False
+
+        checkmate = True
+
+        return checkmate
+
+    def end_game(self, winner: str) -> None:
+        # replace
+        print(f"{winner} Wins")
