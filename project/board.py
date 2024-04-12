@@ -39,7 +39,7 @@ class Board():
             height (int): height of screen
         """
         self._width: int = width
-        self._heght:int = height
+        self._heght: int = height
         self._white_pieces: list = []
         self._black_pieces: list = []
         self._white_location: list = []
@@ -50,6 +50,8 @@ class Board():
         self._black_king = None
         self._white_king = None
         self._in_check = None
+        self._enpessant = False
+        self._enpessant_pawn = None
 
     # Set up the chess pieces on the board
     def setup_pieces(self) -> None:
@@ -96,7 +98,7 @@ class Board():
         white_bishop1 = Bishop("white", (2, 7))
         white_queen = Queen("white", (3, 7))
         white_king = King("white", (4, 7))
-        white_bishop2 =Bishop("white", (5, 7))
+        white_bishop2 = Bishop("white", (5, 7))
         white_knight2 = Knight("white", (6, 7))
         white_rook2 = Rook("white", (7, 7))
 
@@ -140,7 +142,7 @@ class Board():
 
     def highlight_selected(self, selected_peice, screen, turn: str) -> None:
         """if player selected peice is not none
-        then highlight all possible locations it can move to 
+        then highlight all possible locations it can move to
 
         Args:
             selected_peice (tuple): player selected peice
@@ -150,19 +152,21 @@ class Board():
             w = (self._width - 800) // 2
             h = (self._heght - 800) // 2
 
-            moves = []
-            if isinstance(selected_peice, King):
-                moves = selected_peice.possible_moves(self._black_location, self._white_location,
-                                                      self._black_pieces, self._white_pieces, turn)
+            if self._enpessant and isinstance(selected_peice, Pawn):
+                if turn == "white":
+                    self._black_pieces.append(self._enpessant_pawn)
+                    self._black_location.append(self._enpessant_pawn.location)
+                    moves = self.actual_moves(turn, selected_peice)
+                    self._black_pieces.remove(self._enpessant_pawn)
+                    self._black_location.remove(self._enpessant_pawn.location)
+                else:
+                    self._white_pieces.append(self._enpessant_pawn)
+                    self._white_location.append(self._enpessant_pawn.location)
+                    moves = self.actual_moves(turn, selected_peice)
+                    self._white_pieces.remove(self._enpessant_pawn)
+                    self._white_location.remove(self._enpessant_pawn.location)
             else:
-                moves = selected_peice.possible_moves(self._black_location, self._white_location)
-                if self._in_check is not None:
-                    selected_moves = moves
-                    moves = []
-                    block_moves = self.in_check_block(turn)
-                    for coord in selected_moves:
-                        if coord  in block_moves:
-                            moves.append(coord)
+                moves = self.actual_moves(turn, selected_peice)
 
             moves.append(selected_peice.location)
 
@@ -188,7 +192,7 @@ class Board():
         # draws black peices
         for peice in self._black_pieces:
             xy_location = peice.location
-            screen.blit(peice._image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
+            screen.blit(peice.image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
 
         # draws captured peices
         white_capture_count = 0
@@ -197,17 +201,17 @@ class Board():
             for peice in self._captured:
                 if peice.color == "white":
                     if white_capture_count < 7:
-                        screen.blit(peice._image, (10 + white_capture_count * 35, h + 0 * 100))
+                        screen.blit(peice.image, (10 + white_capture_count * 35, h + 0 * 100))
                     else:
-                        screen.blit(peice._image, (10 + (white_capture_count -7) * 35,
-                                                   (h *1.5) + 0 * 100))
+                        screen.blit(peice.image, (10 + (white_capture_count - 7) * 35,
+                                                  (h * 1.5) + 0 * 100))
                     white_capture_count += 1
                 elif peice.color == "black":
                     if black_capture_count < 7:
-                        screen.blit(peice._image, (10 + black_capture_count * 35, h + 7 * 100))
+                        screen.blit(peice.image, (10 + black_capture_count * 35, h + 7 * 100))
                     else:
-                        screen.blit(peice._image, (10 + (black_capture_count - 7) * 35,
-                                                   (h *1.5) + 7 * 100))
+                        screen.blit(peice.image, (10 + (black_capture_count - 7) * 35,
+                                                  (h * 1.5) + 7 * 100))
                     black_capture_count += 1
 
     def update_locations(self) -> None:
@@ -230,7 +234,7 @@ class Board():
 
         self._black_location = locations
 
-    def select(self, color: str, coord: tuple) -> tuple:
+    def select(self, color: str, coord: tuple):
         """returns a peice infomation based on coord
 
         Args:
@@ -238,27 +242,24 @@ class Board():
             coord (tuple): location of coordinate
 
         Returns:
-            tuple: infomation based on peice occupying tile(object, index in list)
+            peice: selected peice
         """
-        index:int = 0
         if color == "white":
             for peice in self._white_pieces:
                 if coord == peice.location:
-                    return (peice, index)
-                index += 1
+                    return peice
         elif color == "black":
             for peice in self._black_pieces:
                 if coord == peice.location:
-                    return (peice, index)
-                index += 1
-        return (None, None)
+                    return peice
+        return None
 
-    def move(self, color: str, index: int, new_location: tuple) -> bool:
+    def move(self, color: str, selected_peice, new_location: tuple) -> bool:
         """moves a peice
 
         Args:
             color (str): color of player
-            index (int): index of peice that is moving in list
+            selected_peice : selected peice fo player
             new_location (tuple): location waning to move peice to
 
         Returns:
@@ -267,58 +268,68 @@ class Board():
         # move a peice
         move = False
         last_location = None
-        if color == "white":
-            peice = self._white_pieces[index]
-            if isinstance(peice, King):
-                last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location,
-                                  self._black_pieces, self._white_pieces)
-            elif self._in_check is not None:
-                last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location,
-                                  self.in_check_block(color))
-            else:
-                last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location, None)
 
-
-        elif color == "black":
-            peice = self._black_pieces[index]
-            if isinstance(peice, King):
-                last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location,
-                                  self._black_pieces, self._white_pieces)
-            elif self._in_check is not None:
-                last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location,
-                                  self.in_check_block(color))
+        if self._enpessant and isinstance(selected_peice, Pawn):
+            if color == "white":
+                self._black_pieces.append(self._enpessant_pawn)
+                self._black_location.append(self._enpessant_pawn.location)
             else:
-                last_location = peice.location
-                move = peice.move(new_location, self._black_location, self._white_location, None)
+                self._white_pieces.append(self._enpessant_pawn)
+                self._white_location.append(self._enpessant_pawn.location)
+
+        actual_moves = self.actual_moves(color, selected_peice)
+
+        if new_location in actual_moves:
+            if isinstance(selected_peice, King):
+                last_location = selected_peice.location
+                move = selected_peice.move(new_location, self._black_location, self._white_location,
+                                           self._black_pieces, self._white_pieces)
+            else:
+                last_location = selected_peice.location
+                move = selected_peice.move(new_location, self._black_location, self._white_location)
+
+        if self._enpessant and isinstance(selected_peice, Pawn):
+            if color == "white":
+                self._black_pieces.remove(self._enpessant_pawn)
+                self._black_location.remove(self._enpessant_pawn.location)
+            else:
+                self._white_pieces.remove(self._enpessant_pawn)
+                self._white_location.remove(self._enpessant_pawn.location)
+
         if move:
+            if self._enpessant and new_location == self._enpessant_pawn.location:
+                self.check_capture(color, self._last_peice_moved.location)
+
             self._old_location = last_location
-            self._last_peice_moved = peice
+            self._last_peice_moved = selected_peice
+
+            if isinstance(self._last_peice_moved, Pawn) and \
+                    new_location[1] == self._old_location[1] + 2 or \
+                    new_location[1] == self._old_location[1] - 2:
+                self.enpassant(selected_peice, True)
+            else:
+                self.enpassant(selected_peice, False)
 
             self.check_capture(color, new_location)
             self.update_locations()
 
-            check = self.is_in_check(color)
-
-            if check and color == "white":
-                self._in_check = self._black_king
-                checkmate = self.check_checkmate("black")
-                if checkmate:
-                    self.end_game(color)
-            elif check and color == "black":
-                self._in_check = self._white_king
-                checkmate = self.check_checkmate("white")
-            else:
-                self._in_check = None
+            self.check_endgame_conditions(color)
 
         return move
 
+    def enpassant(self, peice, able: bool):
+        if able:
+            self._enpessant = True
+            if peice.color == "white":
+                self._enpessant_pawn = Pawn(peice.color, (peice.location[0], 5))
+            else:
+                self._enpessant_pawn = Pawn(peice.color, (peice.location[0], 2))
+        else:
+            self._enpessant = False
+            self._enpessant_pawn = None
+
     def check_capture(self, color, location) -> None:
-        """checks new peice location for any captures. 
+        """checks new peice location for any captures.
         If so then removes captured peice from list and adds it to captured
 
         Args:
@@ -356,8 +367,8 @@ class Board():
         attacking = self._last_peice_moved
         block_tile = []
         distance = 1
-        temp_coord = (0,0)
-        direction = (0,0)
+        temp_coord = (0, 0)
+        direction = (0, 0)
 
         if turn == "white":
             king = self._white_king
@@ -365,39 +376,15 @@ class Board():
             king = self._black_king
 
         if not isinstance(attacking, Knight):
-            # find attaking location reletive to king ie attack direction n e s w, ne se sw nw
-            if attacking.location[0] > king.location[0]:
-                # to the right of king
-                if attacking.location[1] > king.location[1]:
-                    # attacker SE of king
-                    direction = (-1, -1)
-                elif attacking.location[1] < king.location[1]:
-                    # attacker NE of king
-                    direction = (-1, 1)
-                elif attacking.location[1] == king.location[1]:
-                    # attacking E of king
-                    direction = (-1, 0)
+            x = king.location[0] - attacking.location[0]
+            y = king.location[1] - attacking.location[1]
 
-            elif attacking.location[0] < king.location[0]:
-                # to the left of king
-                if attacking.location[1] > king.location[1]:
-                    # attacker SW of king
-                    direction = (1, -1)
-                elif attacking.location[1] < king.location[1]:
-                    # attacker NW of king
-                    direction = (1, 1)
-                elif attacking.location[1] == king.location[1]:
-                    # attacking W of king
-                    direction = (1, 0)
-
-            elif attacking.location[0] == king.location[0]:
-                # same row as king
-                if attacking.location[1] > king.location[1]:
-                    # attacking s of king
-                    direction = (0, -1)
-                elif attacking.location[1] < king.location[1]:
-                    # attacking n of king
-                    direction = (0, 1)
+            if x == 0:
+                direction = (x, y // abs(y))
+            elif y == 0:
+                direction = (x // abs(x), y)
+            else:
+                direction = (x // abs(x), y // abs(y))
 
             while temp_coord != king.location:
                 temp_coord = (attacking.location[0] + direction[0] * distance,
@@ -409,6 +396,85 @@ class Board():
         block_tile.append(attacking.location)
 
         return block_tile
+
+    def actual_moves(self, color: str, peice) -> list:
+        moves = []
+
+        if isinstance(peice, King):
+            moves = peice.possible_moves(self._black_location, self._white_location,
+                                         self._black_pieces, self._white_pieces, color)
+
+            if self._in_check is not None and self._in_check.color == color:
+                if color == "white" and (2, 7) in moves:
+                    moves.remove((2, 7))
+                if color == "white" and (6, 7) in moves:
+                    moves.remove((6, 7))
+                if color == "black" and (2, 0) in moves:
+                    moves.remove((2, 0))
+                if color == "black" and (6, 0) in moves:
+                    moves.remove((6, 0))
+
+        else:
+            moves = peice.possible_moves(self._black_location, self._white_location)
+
+            # check block handeling
+            if self._in_check is not None:
+                selected_moves = moves
+                moves = []
+                block_moves = self.in_check_block(color)
+                for coord in selected_moves:
+                    if coord in block_moves:
+                        moves.append(coord)
+
+            # check if move dosn't put king in check
+            moves = self.check_can_move(color, peice, moves)
+
+        return moves
+
+    def check_can_move(self, color: str, peice, moves: list) -> list:
+        # check if move dosn't put king in check
+        if color == "white":
+            temp_location = self._white_location
+            temp_peice = self._white_pieces
+            enemy_location = self._black_location
+
+        else:
+            temp_location = self._black_location
+            temp_peice = self._black_pieces
+            enemy_location = self._white_location
+
+        check_move = moves
+        moves = []
+        safe = True
+        temp_location.remove(peice.location)
+        temp_peice.remove(peice)
+
+        for coord in check_move:
+            peice_type = type(peice)(color, coord)
+
+            temp_location.append(coord)
+            temp_peice.append(peice_type)
+
+            if coord in enemy_location:
+                moves.append(coord)
+            elif color == "white":
+                safe = self._white_king.is_safe(self._black_location, temp_location,
+                                                self._black_pieces, temp_peice,
+                                                self._white_king.location)
+            else:
+                safe = self._black_king.is_safe(temp_location, self._white_location,
+                                                temp_peice, self._white_pieces,
+                                                self._black_king.location)
+            if safe:
+                moves.append(coord)
+
+            temp_location.remove(coord)
+            temp_peice.remove(peice_type)
+
+        temp_location.append(peice.location)
+        temp_peice.append(peice)
+
+        return moves
 
     def check_checkmate(self, color: str) -> bool:
         king_can_move = False
@@ -424,7 +490,7 @@ class Board():
             if not (can_block or king_can_move):
                 if isinstance(peice, King):
                     moves = peice.possible_moves(self._black_location, self._white_location,
-                                                self._black_pieces, self._white_pieces, color)
+                                                 self._black_pieces, self._white_pieces, color)
                     if len(moves) > 0:
                         return False
 
@@ -439,6 +505,55 @@ class Board():
 
         return checkmate
 
+    def check_stalemate(self, color: str) -> bool:
+        if color == "white":
+            friend = self._white_pieces
+        else:
+            friend = self._black_pieces
+
+        for peice in friend:
+            if isinstance(peice, King):
+                moves = peice.possible_moves(self._black_location, self._white_location,
+                                             self._black_pieces, self._white_pieces, color)
+                if len(moves) > 0:
+                    return False
+
+            else:
+                moves = self.actual_moves(color, peice)
+                if len(moves) > 0:
+                    return False
+
+        if self._in_check is None:
+            stalemate = True
+        else:
+            stalemate = False
+
+        return stalemate
+
+    def check_endgame_conditions(self, color: str):
+        check = self.is_in_check(color)
+
+        if check and color == "white":
+            self._in_check = self._black_king
+            checkmate = self.check_checkmate("black")
+            stalemate = self.check_stalemate("black")
+        elif check and color == "black":
+            self._in_check = self._white_king
+            checkmate = self.check_checkmate("white")
+            stalemate = self.check_stalemate("white")
+        else:
+            self._in_check = None
+            checkmate = False
+            stalemate = False
+
+        if checkmate:
+            self.end_game(color)
+        elif stalemate:
+            self.end_game(color)
+
     def end_game(self, winner: str) -> None:
         # replace
-        print(f"{winner} Wins")
+        if self._in_check is not None:
+            print(f"{winner} Wins")
+        else:
+            print("stalemate")

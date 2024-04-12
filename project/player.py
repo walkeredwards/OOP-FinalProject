@@ -7,8 +7,8 @@ class Player():
     """player class"""
     def __init__(self, color: str) -> None:
         """initialization"""
-        self._color = color # color black or white
-        self._selected_peice_info = (None, None) # info of selected peice (peice, index)
+        self._color = color  # color black or white
+        self._selected_peice_info = None  # selected peice
 
     @property
     def color(self) -> str:
