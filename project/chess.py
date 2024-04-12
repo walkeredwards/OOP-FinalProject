@@ -35,8 +35,8 @@ def main():
     game = Board(WIDTH, HEIGHT)
     game.setup_pieces()
 
+    # draws board
     screen.fill("black")
-
     game.make_board(screen)
     game.draw_pieces(screen)
 
@@ -52,8 +52,7 @@ def main():
                 click = player_1.click(WIDTH, HEIGHT)
 
                 if player_1.selected_peice_info is None:
-
-                    # takes location and checks if peice is there
+                    # takes location and checks if a player peice is there
                     player_1.selected_peice_info = game.select(turn, click)
                 else:
                     # if player has selected peice then check avalible moves
@@ -65,9 +64,11 @@ def main():
                     if player_move:
                         # if move is valid then switch turns
                         turn = "black"
+                # draws the board after player click
                 game.make_board(screen)
                 game.highlight_selected(player_1.selected_peice_info, screen, turn)
                 game.draw_pieces(screen)
+
             elif event.type == pygame.MOUSEBUTTONDOWN and turn == "black":
                 # mouse click player 2
                 # gets coord of player click
@@ -88,6 +89,7 @@ def main():
                     if player_move:
                         # if move is valid then switch turns
                         turn = "white"
+                # draws the board after player click
                 game.make_board(screen)
                 game.highlight_selected(player_2.selected_peice_info, screen, turn)
                 game.draw_pieces(screen)
