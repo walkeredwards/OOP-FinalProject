@@ -633,6 +633,11 @@ class Board:
                 selected._y = y
                 print(f"Moved to ({x}, {y})")
                 # Need to add function after piece is moved to capture piece if it moved to a square with an enemy
+                if isinstance(selected, Pawn):
+                    if selected._color == "white" and selected._y == 0:
+                        game.draw_end_popup()
+                    elif selected._color == "black" and selected._y == 7:
+                        selected.promotion()
                 validMove = True
                 return None
             else:
@@ -731,9 +736,7 @@ if __name__ == "__main__":
                     if (validMove):
                         turn = switchTurn(turn)
                         game.make_board()
-                        if isinstance(selected, Pawn):
-                            if (selected._color == "white" and selected.y == 0) or (selected._color == "black" and selected.y == 7):
-                                selected.promotion()
+                            
                 game.setup_pieces()
         
         pygame.display.flip()
