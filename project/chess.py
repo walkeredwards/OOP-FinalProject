@@ -636,8 +636,10 @@ class Board:
                 if isinstance(selected, Pawn):
                     if selected._color == "white" and selected._y == 0:
                         game.draw_end_popup()
+                        #selected.promotion()
                     elif selected._color == "black" and selected._y == 7:
-                        selected.promotion()
+                        game.draw_end_popup()
+                        #selected.promotion()
                 validMove = True
                 return None
             else:
