@@ -71,31 +71,27 @@ class Pawn():
         
     def checkMoves(self) -> list:
         possible_moves = []
-        if self._color == "white":
-            friendly_locations = get_white_locations()
-            enemy_locations = get_black_locations()
-            if (self.x, self.y + 1) not in friendly_locations and \
-                    (self.x, self.y + 1) not in enemy_locations and self.y < 7:
+        if self._color == "black":
+            if not Board.checkFriendly(self._color, self.x, self.y + 1) and \
+                    not Board.checkEnemies(self._color, self.x, self.y + 1) and self.y < 7:
                 possible_moves.append((self.x, self.y + 1))
-            if (self.x, self.y + 2) not in friendly_locations and \
-                    (self.x, self.y + 2) not in enemy_locations and self.y == 1:
+            if not Board.checkFriendly(self._color, self.x, self.y + 2) and \
+                    not Board.checkEnemies(self._color, self.x, self.y + 2) and self.y == 1:
                 possible_moves.append((self.x, self.y + 2))
-            if (self.x + 1, self.y + 1) in enemy_locations:
+            if Board.checkEnemies(self._color, self.x + 1, self.y + 1):
                 possible_moves.append((self.x + 1, self.y + 1))
-            if (self.x - 1, self.y + 1) in enemy_locations:
+            if Board.checkEnemies(self._color, self.x - 1, self.y + 1):
                 possible_moves.append((self.x - 1, self.y + 1))
         else:
-            friendly_locations = get_black_locations()
-            enemy_locations = get_white_locations()
-            if (self.x, self.y - 1) not in enemy_locations and \
-                    (self.x, self.y - 1) not in friendly_locations and self.y > 0:
+            if not Board.checkEnemies(self._color, self.x, self.y - 1) and \
+                    not Board.checkFriendly(self._color, self.x, self.y - 1) and self.y > 0:
                 possible_moves.append((self.x, self.y - 1))
-            if (self.x, self.y - 2) not in enemy_locations and \
-                    (self.x, self.y - 2) not in friendly_locations and self.y == 6:
+            if not Board.checkEnemies(self._color, self.x, self.y - 2) and \
+                    not Board.checkFriendly(self._color, self.x, self.y - 2) and self.y == 6:
                 possible_moves.append((self.x, self.y - 2))
-            if (self.x + 1, self.y - 1) in enemy_locations:
+            if Board.checkEnemies(self._color, self.x + 1, self.y - 1):
                 possible_moves.append((self.x + 1, self.y - 1))
-            if (self.x - 1, self.y - 1) in enemy_locations:
+            if Board.checkEnemies(self._color, self.x - 1, self.y - 1):
                 possible_moves.append((self.x - 1, self.y - 1))
         return possible_moves
     
@@ -104,32 +100,32 @@ class Pawn():
             white_pieces.remove(self)
             pygames_choice = input() #need help w pygame initalize
             if pygames_choice == "queen":
-                pawn_queen = Queen("White", self._location)
+                pawn_queen = Queen("PawnQueen", "white", self.x, self.y)
                 white_pieces.append(pawn_queen)
             elif pygames_choice == "rook":
-                pawn_rook = Rook("White", self._location)
+                pawn_rook = Rook("PawnRook", "white", self.x, self.y)
                 white_pieces.append(pawn_rook)
             elif pygames_choice == "bishop":
-                pawn_bishop = Bishop("White", self._location)
+                pawn_bishop = Bishop("PawnBishop", "white", self.x, self.y)
                 white_pieces.append(pawn_bishop)
             elif pygames_choice == "knight":
-                pawn_knight = Knight("White", self._location)
+                pawn_knight = Knight("PawnKnight", "white", self.x, self.y)
                 white_pieces.append(pawn_knight)
 
         else:
             black_pieces.remove(self)
             pygames_choice = input() #need help w pygame initalize
             if pygames_choice == "queen":
-                pawn_queen = Queen("black", self._location)
+                pawn_queen = Queen("PawnQueen", "black", self.x, self.y)
                 black_pieces.append(pawn_queen)
             elif pygames_choice == "rook":
-                pawn_rook = Rook("black", self._location)
+                pawn_rook = Rook("PawnRook", "black", self.x, self.y)
                 black_pieces.append(pawn_rook)
             elif pygames_choice == "bishop":
-                pawn_bishop = Bishop("black", self._location)
+                pawn_bishop = Bishop("PawnBishop", "black", self.x, self.y)
                 black_pieces.append(pawn_bishop)
             elif pygames_choice == "knight":
-                pawn_knight = Knight("black", self._location)
+                pawn_knight = Knight("PawnKnight", "black", self.x, self.y)
                 black_pieces.append(pawn_knight)
 
     def canMove(self, valid_moves, des_x, des_y) -> bool:
@@ -170,14 +166,8 @@ class Bishop():
     def get_location(self):
         return self._x, self._y
     
-    def check_bishop(self):
+    def checkMoves(self):
         possible_moves = []
-        if self._color == 'white':
-            enemy_locations = get_black_locations()
-            friendly_locations = get_white_locations()
-        else:
-            friendly_locations = get_black_locations()
-            enemy_locations = get_white_locations()
         for i in range(4):
             path = True
             chain = 1
@@ -194,10 +184,10 @@ class Bishop():
                 x = -1
                 y = 1
             while path:
-                if (self.x + (chain * x), self.y + (chain * y)) not in friendly_locations and \
+                if not Board.checkFriendly(self._color, self.x + (chain * x), self.y + (chain * y)) and \
                         0 <= self.x + (chain * x) <= 7 and 0 <= self.y + (chain * y) <= 7:
                     possible_moves.append((self.x + (chain * x), self.y + (chain * y)))
-                    if (self.x + (chain * x), self.y + (chain * y)) in enemy_locations:
+                    if Board.checkEnemies(self._color, self.x + (chain * x), self.y + (chain * y)):
                         path = False
                     chain += 1
                 else:
@@ -242,16 +232,12 @@ class Knight():
     def get_location(self):
         return self._x, self._y
     
-    def check_knight(self) -> list:
+    def checkMoves(self) -> list:
         possible_moves = []
-        if self._color == 'white':
-            friendly_locations = get_white_locations()
-        else:
-            friendly_locations = get_black_locations()
         targets = [(1, 2), (1, -2), (2, 1), (2, -1), (-1, 2), (-1, -2), (-2, 1), (-2, -1)]
         for i in range(8):
             target = (self.x + targets[i][0], self.y + targets[i][1])
-            if target not in friendly_locations and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
+            if not Board.checkFriendly(self._color, target[0], target[1]) and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
                 possible_moves.append(target)
         return possible_moves
     
@@ -287,7 +273,7 @@ class Rook():
         """ getter for Rook's y coordinate"""
         return self._y
 
-    def checkMoves(self, des_x, des_y) -> list:
+    def checkMoves(self) -> list:
         """ Returns list with allowed squares piece can move to."""
         valid_moves = []
         # Checks for the 4 directions
@@ -362,7 +348,7 @@ class Queen():
         return self._y
     #def check():
 
-    def checkMoves(self, des_x, des_y) -> list:
+    def checkMoves(self) -> list:
         """ Returns list with allowed squares piece can move to."""
         valid_moves = []
         # Checks for the 4 directions
@@ -454,7 +440,7 @@ class King():
         """ getter for King's y coordinate"""
         return self._y
 
-    def checkMoves(self, des_x, des_y) -> list:
+    def checkMoves(self) -> list:
         """ Returns list with allowed squares piece can move to."""
         valid_moves = []
         # all 8 possible moves
@@ -487,7 +473,7 @@ Black_Bishop2 = Bishop("Black_Bishop_2", "black", 5, 0)
 Black_Knight2 = Knight("Black_Knight_2", "black", 6, 0)
 Black_Rook2 = Rook("Black_Rook_2", "black", 7, 0)
 # Row 2
-Black_Pawn1 = Pawn("Black_Pawn_1", "black", 0, 1)
+Black_Pawn1 = Pawn("Black_Pawn_1", "Black", 0, 1)
 Black_Pawn2 = Pawn("Black_Pawn_2", "black", 1, 1)
 Black_Pawn3 = Pawn("Black_Pawn_3", "black", 2, 1)
 Black_Pawn4 = Pawn("Black_Pawn_4", "black", 3, 1)
@@ -498,7 +484,6 @@ Black_Pawn8 = Pawn("Black_Pawn_8", "black", 7, 1)
 
 black_pieces = [Black_Pawn1, Black_Pawn2, Black_Pawn3, Black_Pawn4, Black_Pawn5, Black_Pawn6, Black_Pawn7, Black_Pawn8,
                 Black_Rook1, Black_Knight1, Black_Bishop1, Black_Queen1, Black_King, Black_Bishop2, Black_Knight2, Black_Rook2]
-black_locations = []
 
 """ Initialize white pieces for player 2 and put them in a list in an order that 
     corresponds to their starting locations on the board"""
@@ -512,31 +497,19 @@ White_Pawn6 = Pawn("White_Pawn_6", "white", 5, 6)
 White_Pawn7 = Pawn("White_Pawn_7", "white", 6, 6)
 White_Pawn8 = Pawn("White_Pawn_8", "white", 7, 6)
 # Row 2
-White_Rook1 = Rook("White_Rook_1", "White", 0, 7)
-White_Knight1 = Knight("White_Knight_1", "White", 1, 7)
-White_Bishop1 = Bishop("White_Bishop_1", "White", 2, 7)
-White_Queen1 = Queen("White_Queen_1", "White", 3, 7)
-White_King = King("White_King", "White", 4, 7, False)
-White_Bishop2 =Bishop("White_Bishop_2", "White", 5, 7)
-White_Knight2 = Knight("White_Knight_2", "White", 6, 7)
-White_Rook2 = Rook("White_Rook_2", "White", 7, 7)
+White_Rook1 = Rook("White_Rook_1", "white", 0, 7)
+White_Knight1 = Knight("White_Knight_1", "white", 1, 7)
+White_Bishop1 = Bishop("White_Bishop_1", "white", 2, 7)
+White_Queen1 = Queen("White_Queen_1", "white", 3, 7)
+White_King = King("White_King", "white", 4, 7, False)
+White_Bishop2 =Bishop("White_Bishop_2", "white", 5, 7)
+White_Knight2 = Knight("White_Knight_2", "white", 6, 7)
+White_Rook2 = Rook("White_Rook_2", "white", 7, 7)
 
 white_pieces = [White_Pawn1, White_Pawn2, White_Pawn3, White_Pawn4, White_Pawn5, White_Pawn6, White_Pawn7, White_Pawn8,
                 White_Rook1, White_Knight1, White_Bishop1, White_Queen1, White_King, White_Bishop2, White_Knight2, White_Rook2]
 
-white_locations = []
 
-def get_white_locations():
-    for piece in white_pieces:
-        location = piece.get_location()
-        white_locations.append(location)
-    return white_locations 
-
-def get_black_locations():
-    for piece in black_pieces:
-        location = piece.get_location()
-        black_locations.append(location)
-    return black_locations 
 
 validMove = False
 
@@ -635,7 +608,7 @@ class Board:
                     if (piece.x == x and piece.y == y):
                         print(f"{piece._name}, ({piece.x}, {piece.y})")
                         square = (x, y)
-                        moves = piece.checkMoves(x, y)
+                        moves = piece.checkMoves()
                         Board.highlightMoves(moves, turn)
                         pygame.draw.rect(screen, 'green', [w + x * 100, h + y * 100, 100, 100])
                         return piece
@@ -645,7 +618,7 @@ class Board:
                     if (piece.x == x and piece.y == y):
                         print(f"{piece._name}, ({piece.x}, {piece.y})")
                         square = (x, y)
-                        moves = piece.checkMoves(x, y)
+                        moves = piece.checkMoves()
                         Board.highlightMoves(moves, turn)
                         pygame.draw.rect(screen, 'hot pink', [w + x * 100, h + y * 100, 100, 100])
                         return piece
@@ -653,7 +626,7 @@ class Board:
         # If a piece has been selected
         else:
             # Need add function make sure selected square to move piece to is a valid move
-            moves = selected.checkMoves(x, y)
+            moves = selected.checkMoves()
             if (not Board.checkFriendly(turn, x, y) and selected.canMove(moves, x, y)):
                 # Call piece's check move, passing in
                 selected._x = x
@@ -666,6 +639,45 @@ class Board:
                 game.make_board()
                 return None
         validMove = False
+    
+    def draw_end_popup() -> None:
+        screen.fill((255, 255, 255))
+        font = pygame.font.Font(None, 36)
+        message = font.render("Do you want to play again?", True, 'black')
+        message_rect = message.get_rect(center=(WIDTH // 2, HEIGHT // 3))
+        screen.blit(message, message_rect)
+
+        button_w = 150
+        button_h = 50
+        button_y = HEIGHT // 2
+
+        play_button_x = (WIDTH - button_w - 50) // 2
+        quit_button_x = (WIDTH + 50) // 2
+
+        pygame.draw.rect(screen, 'green', [play_button_x, button_y, button_w, button_h])
+        pygame.draw.rect(screen, 'red', [quit_button_x, button_y, button_w, button_h])
+
+        play_text = font.render("Play Again", True, 'black')
+        play_text_rect = play_text.get_rect(center=(play_button_x + button_w // 2, button_y + button_h // 2))
+        screen.blit(play_text, play_text_rect)
+
+        quit_text = font.render("Quit", True, 'black')
+        quit_text_rect = quit_text.get_rect(center=(quit_button_x + button_w // 2, button_y + button_h // 2))
+        screen.blit(quit_text, quit_text_rect)
+
+        pygame.display.flip()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = pygame.mouse.get_pos()
+                    if play_button_x <= x <= play_button_x + button_w and button_y <= y <= button_y + button_h:
+                        return True
+                    elif quit_button_x <= x <= quit_button_x + button_w and button_y <= y <= button_y + button_h:
+                        return False
+
 
 
 def modifiedCoordinates(pos_x, pos_y) -> int:
@@ -707,7 +719,7 @@ if __name__ == "__main__":
             screen.blit(font.render("BLACK'S TURN", False, 'green'), (660, 5))
         else:
             screen.blit(font.render("WHITE'S TURN", False, 'hot pink'), (660, 860))
-
+        #game.draw_end_popup()
         # Takes care of keyboard/mouse input
         for event in pygame.event.get():
             if (event.type == pygame.QUIT):
@@ -719,6 +731,9 @@ if __name__ == "__main__":
                     if (validMove):
                         turn = switchTurn(turn)
                         game.make_board()
+                        if isinstance(selected, Pawn):
+                            if (selected._color == "white" and selected.y == 0) or (selected._color == "black" and selected.y == 7):
+                                selected.promotion()
                 game.setup_pieces()
         
         pygame.display.flip()
