@@ -392,8 +392,6 @@ class Pawn():
         """ getter for Pawn's y coordinate"""
         return self._y
 
-    def promotion() -> None:
-        """ If pawn reaches end of board, player can promote to piece of choosing."""
 
     def checkMoves(self) -> list:
         """ Checks if attempted move is within the allowed squares
@@ -433,29 +431,11 @@ class Pawn():
 
         return valid_moves
 
-
     def canMove(self, valid_moves, des_x, des_y) -> bool:
         for move in valid_moves:
             if (move[0] == des_x and move[1] == des_y):
                 return True
         return False
-
-    """ 
-    def promotion(self, piece) -> None:
-        # When pawn reaches end of the board, player has option to promote pawn to another piece like a Queen.
-        if (self._color == "black"):
-            # For now just automatically make it a queen
-            name = self._name + "_queen"
-            promoted_piece = Queen(name, "black", self.x, self.y)
-            black_pieces.append(promoted_piece)
-            black_pieces.remove(piece)
-        else:
-            #
-            name = self._name + "_queen"
-            promoted_piece = Queen(name, "white", self.x, self.y)
-            black_pieces.append(promoted_piece)
-            black_pieces.remove(self)
-    """
 
 
 """ Initialize black pieces for player 1 and put them in a list in an order that 
@@ -496,14 +476,14 @@ White_Pawn6 = Pawn("White_Pawn_6", "white", 5, 6, False)
 White_Pawn7 = Pawn("White_Pawn_7", "white", 6, 6, False)
 White_Pawn8 = Pawn("White_Pawn_8", "white", 7, 6, False)
 # Row 2
-White_Rook1 = Rook("White_Rook_1", "White", 0, 7, False)
-White_Knight1 = Knight("White_Knight_1", "White", 1, 7)
-White_Bishop1 = Bishop("White_Bishop_1", "White", 2, 7)
-White_Queen1 = Queen("White_Queen_1", "White", 3, 7)
-White_King = King("White_King", "White", 4, 7, False)
-White_Bishop2 =Bishop("White_Bishop_2", "White", 5, 7)
-White_Knight2 = Knight("White_Knight_2", "White", 6, 7)
-White_Rook2 = Rook("White_Rook_2", "White", 7, 7, False)
+White_Rook1 = Rook("White_Rook_1", "white", 0, 7, False)
+White_Knight1 = Knight("White_Knight_1", "white", 1, 7)
+White_Bishop1 = Bishop("White_Bishop_1", "white", 2, 7)
+White_Queen1 = Queen("White_Queen_1", "white", 3, 7)
+White_King = King("White_King", "white", 4, 7, False)
+White_Bishop2 =Bishop("White_Bishop_2", "white", 5, 7)
+White_Knight2 = Knight("White_Knight_2", "white", 6, 7)
+White_Rook2 = Rook("White_Rook_2", "white", 7, 7, False)
 
 white_pieces = [White_Pawn1, White_Pawn2, White_Pawn3, White_Pawn4, White_Pawn5, White_Pawn6, White_Pawn7, White_Pawn8,
                 White_Rook1, White_Knight1, White_Bishop1, White_Queen1, White_King, White_Bishop2, White_Knight2, White_Rook2]
@@ -512,6 +492,7 @@ captured_white_pieces = []
 
 # Bool to check if a valid move has been made
 validMove = False
+
 
 """ Class that handles setting up the board and placing the pieces and the functions necessary to do that."""
 class Board:    
@@ -530,10 +511,10 @@ class Board:
             for col in range(8):
                 if (row + col) % 2 == 0:
                     # Even squares will be black
-                    pygame.draw.rect(screen, 'black', [w + col * 100, h + row * 100, 100, 100])
+                    pygame.draw.rect(screen, 'white', [w + col * 100, h + row * 100, 100, 100])
                 else:
                     # Odd squares will be white
-                    pygame.draw.rect(screen, 'white', [w + col * 100, h + row * 100, 100, 100])
+                    pygame.draw.rect(screen, 'black', [w + col * 100, h + row * 100, 100, 100])
 
 
     def setup_pieces():
@@ -594,6 +575,114 @@ class Board:
                     captured_black_pieces.append(piece)
                     black_pieces.remove(piece)
 
+    def promotion(piece) -> None:
+        """
+        If pawn reaches end of board, player can promote to piece of choosing.
+        
+        Args: piece: current pawn player is promoting
+
+        Return: None:  
+        """
+        w = (WIDTH - 800) // 2
+        h = (HEIGHT - 800) // 2
+
+        screen.fill((0, 0, 0))
+        font_title = pygame.font.Font('font/ka1.ttf', 70)
+
+        if (piece._color == 'white'):
+            font_color = 'hot pink'
+        else:
+            font_color = 'green'
+
+        message = font_title.render("Choose a piece to promote", True, font_color)
+        message_rect = message.get_rect(center = (WIDTH // 2, HEIGHT // 3))
+        screen.blit(message, message_rect)
+
+        # Draw background rects for pieces
+        x_pos = 350
+        for i in range(5):
+            pygame.draw.rect(screen, font_color, [x_pos, 400, 100, 100])
+            x_pos += 200
+
+        # Draw queen option
+        queen_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/queen.png'), (90, 90))
+        queen_rect = queen_image.get_rect(topleft=(350, 400))
+        screen.blit(queen_image, queen_rect)
+        # Draw bishop option
+        bishop_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/bishop.png'), (90, 90))
+        bishop_rect = bishop_image.get_rect(topleft=(550, 400))
+        screen.blit(bishop_image, bishop_rect)
+        # Draw rook option
+        rook_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/rook.png'), (90, 90))
+        rook_rect = rook_image.get_rect(topleft=(750, 400))
+        screen.blit(rook_image, rook_rect)
+        # Draw knight option
+        knight_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/knight.png'), (90, 90))
+        knight_rect = knight_image.get_rect(topleft=(950, 400))
+        screen.blit(knight_image, knight_rect)
+        # Draw pawn option
+        pawn_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/pawn.png'), (90, 90))
+        pawn_rect = pawn_image.get_rect(topleft=(1150, 400))
+        screen.blit(pawn_image, pawn_rect)
+
+        pygame.display.flip()
+
+        promoted = False
+        while not promoted:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = pygame.mouse.get_pos()
+                    # Save x and y of current pawn
+                    x_coord = piece.x
+                    y_coord = piece.y
+                    if (queen_rect.collidepoint(event.pos)):
+                        if (piece._color == 'white'):
+                            white_pieces.remove(piece)
+                            promoted_piece = Queen("White_Queen_Promoted", "white", x_coord, y_coord)
+                            white_pieces.append(promoted_piece)
+                            promoted = True
+                        else:
+                            black_pieces.remove(piece)
+                            promoted_piece = Queen("Black_Queen_Promoted", "black", x_coord, y_coord)
+                            black_pieces.append(promoted_piece)
+                            promoted = True
+                    elif (bishop_rect.collidepoint(event.pos)):
+                        if (piece._color == 'white'):
+                            white_pieces.remove(piece)
+                            promoted_piece = Bishop("White_Bishop_Promoted", "white", x_coord, y_coord)
+                            white_pieces.append(promoted_piece)
+                            promoted = True
+                        else:
+                            black_pieces.remove(piece)
+                            promoted_piece = Bishop("Black_Bishop_Promoted", "black", x_coord, y_coord)
+                            black_pieces.append(promoted_piece)
+                            promoted = True
+                    elif (rook_rect.collidepoint(event.pos)):
+                        if (piece._color == 'white'):
+                            white_pieces.remove(piece)
+                            promoted_piece = Rook("White_Rook_Promoted", "white", x_coord, y_coord, True)
+                            white_pieces.append(promoted_piece)
+                            promoted = True
+                        else:
+                            black_pieces.remove(piece)
+                            promoted_piece = Rook("Black_Rook_Promoted", "black", x_coord, y_coord, True)
+                            black_pieces.append(promoted_piece)
+                            promoted = True
+                    elif (knight_rect.collidepoint(event.pos)):
+                        if (piece._color == 'white'):
+                            white_pieces.remove(piece)
+                            promoted_piece = Knight("White_Knight_Promoted", "white", x_coord, y_coord)
+                            white_pieces.append(promoted_piece)
+                            promoted = True
+                        else:
+                            black_pieces.remove(piece)
+                            promoted_piece = Knight("Black_Knight_Promoted", "black", x_coord, y_coord)
+                            black_pieces.append(promoted_piece)
+                            promoted = True
+                    elif (pawn_rect.collidepoint(event.pos)):
+                        promoted = True
 
     def highlightMoves(valid_moves, turn):
         """ Function that highlights the possible squares a piece is allowed to move to."""
@@ -606,6 +695,54 @@ class Board:
             else:
                 pygame.draw.rect(screen, 'hot pink', [w + move[0] * 100, h + move[1] * 100, 100, 100], 3)
 
+    def draw_end_popup() -> None:
+        """ When the game ends, fill screen with prompt to play again or quit the game."""
+        w = (WIDTH - 800) // 2
+        h = (HEIGHT - 800) // 2
+
+        screen.fill((255, 255, 255))
+
+        font_header = pygame.font.Font('font/ka1.ttf', 100)
+        font_title = pygame.font.Font('font/ka1.ttf', 70)
+        font = pygame.font.Font('font/ka1.ttf', 36)
+
+        gameover = font_header.render("GAME OVER", True, 'red')
+        gameover_rect = gameover.get_rect(center = (WIDTH // 2, HEIGHT // 5))
+        message = font_title.render("Do you want to play again?", True, 'black')
+        message_rect = message.get_rect(center = (WIDTH // 2, HEIGHT // 3))
+        screen.blit(gameover, gameover_rect)
+        screen.blit(message, message_rect)
+
+        button_w = 150
+        button_h = 50
+        button_y = HEIGHT // 2 + 55
+
+        play_button_x = (WIDTH - button_w - 250) // 2
+        quit_button_x = (WIDTH + 100) // 2
+
+        pygame.draw.rect(screen, 'green', [500, button_y, 350, button_h])
+        pygame.draw.rect(screen, 'red', [quit_button_x, button_y, button_w, button_h])
+
+        play_text = font.render("Play Again", True, 'black')
+        play_text_rect = play_text.get_rect(center=(play_button_x + button_w // 2, button_y + button_h // 2))
+        screen.blit(play_text, play_text_rect)
+
+        quit_text = font.render("Quit", True, 'black')
+        quit_text_rect = quit_text.get_rect(center=(quit_button_x + button_w // 2, button_y + button_h // 2))
+        screen.blit(quit_text, quit_text_rect)
+
+        pygame.display.flip()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if(quit_text_rect.collidepoint(event.pos)):
+                        pygame.quit()
+                    elif(play_text_rect.collidepoint(event.pos)):
+                        # Add code to reset board and restart the game.
+                        print("Start game over.")
 
     def movePiece(turn: str):
         """ Function that handles clicking on a piece and moving it to another square."""
@@ -649,6 +786,17 @@ class Board:
                 selected._x = x
                 selected._y = y
                 print(f"Moved to ({x}, {y})")
+
+                # Call promotion function if pawn reaches end of board
+                if(isinstance(selected, Pawn)):
+                    if ((selected._color == 'white' and selected._y == 0) or (selected._color == 'black' and selected._y == 7)):
+                        Board.promotion(selected)
+                        game.make_board()
+
+                # Change later to if checkmate
+                if isinstance(selected, Pawn):
+                    if (selected._color == "white" and selected._y == 0):
+                        Board.draw_end_popup()
 
                 # Need to add function after piece is moved to capture piece if it moved to a square with an enemy
                 validMove = True
