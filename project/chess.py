@@ -733,7 +733,8 @@ class Board:
 
         pygame.display.flip()
 
-        while True:
+        chosen = False
+        while not chosen:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -741,8 +742,11 @@ class Board:
                     if(quit_text_rect.collidepoint(event.pos)):
                         pygame.quit()
                     elif(play_text_rect.collidepoint(event.pos)):
+                        global done
                         # Add code to reset board and restart the game.
                         print("Start game over.")
+                        done = True
+                        chosen = True
 
     def movePiece(turn: str):
         """ Function that handles clicking on a piece and moving it to another square."""
@@ -836,40 +840,42 @@ def switchTurn(turn: str) -> str:
         return "black"
     return "white"
 
-
+done = False
 """ Main function with game loop"""
 if __name__ == "__main__":
     running = True
-    selected = None
-    turn = "white"
-
-    # Create 8 by 8 board and add pieces onto the board
-    game = Board
-    game.make_board()
-    game.setup_pieces()
-
-    # Start game loop
+    
     while running:
-        timer.tick(fps)
+        selected = None
+        turn = "white"
 
-        """ Move later to function to put on screen for whoever's turn it is"""
-        if(turn == "black"):
-            screen.blit(font.render("BLACK'S TURN", False, 'green'), (660, 5))
-        else:
-            screen.blit(font.render("WHITE'S TURN", False, 'hot pink'), (660, 860))
+        # Create 8 by 8 board and add pieces onto the board
+        game = Board
+        game.make_board()
+        game.setup_pieces()
+        # Start game loop
+        while not done:
+            timer.tick(fps)
 
-        # Takes care of keyboard/mouse input
-        for event in pygame.event.get():
-            if (event.type == pygame.QUIT):
-                running = False
+            """ Move later to function to put on screen for whoever's turn it is"""
+            if(turn == "black"):
+                screen.blit(font.render("BLACK'S TURN", False, 'green'), (660, 5))
+            else:
+                screen.blit(font.render("WHITE'S TURN", False, 'hot pink'), (660, 860))
 
-            elif (event.type == pygame.MOUSEBUTTONDOWN):
-                if (event.button == 1): # 3 is right click
-                    selected = game.movePiece(turn)
-                    if (validMove):
-                        turn = switchTurn(turn)
-                        game.make_board()
-                game.setup_pieces()
+            # Takes care of keyboard/mouse input
+            for event in pygame.event.get():
+                if (event.type == pygame.QUIT):
+                    done = True
+                    running = False
 
-        pygame.display.flip()
-    pygame.quit()
+                elif (event.type == pygame.MOUSEBUTTONDOWN):
+                    if (event.button == 1): # 3 is right click
+                        selected = game.movePiece(turn)
+                        if (validMove):
+                            turn = switchTurn(turn)
+                            game.make_board()
+                    game.setup_pieces()
+
+            pygame.display.flip()
+        pygame.quit()
