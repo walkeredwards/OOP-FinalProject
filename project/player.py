@@ -1,6 +1,8 @@
 """player class"""
 
 import pygame
+# from collections.abc import Callable
+from peices import Piece
 
 
 class Player():
@@ -16,16 +18,16 @@ class Player():
         return self._color
 
     @property
-    def selected_peice_info(self):
+    def selected_peice_info(self) -> Piece:
         """getter for _selected_peice"""
         return self._selected_peice_info
 
     @selected_peice_info.setter
-    def selected_peice_info(self, peice) -> None:
+    def selected_peice_info(self, peice: Piece) -> None:
         """setter for _selected_peice_info"""
         self._selected_peice_info = peice
 
-    def click(self, width: int, height: int) -> tuple:
+    def click(self, width: int, height: int) -> tuple[int, int]:
         """gets coordanates for click
 
         Args:
@@ -33,7 +35,7 @@ class Player():
             height (int): hight of screen
 
         Returns:
-            tuple: cordanite (x, y)
+            tuple [int, int]: cordanite (x, y)
         """
         # corner of board
         w = (width - 800) // 2

@@ -31,6 +31,7 @@ from peices import Pawn
 
 
 class Board():
+    """board class"""
     def __init__(self, width, height) -> None:
         """board initalizer.
 
@@ -331,9 +332,9 @@ class Board():
             self._last_peice_moved = selected_peice
 
             # if a pawn moved 2 tile set up for enpassant
-            if isinstance(self._last_peice_moved, Pawn) and \
-                    new_location[1] == self._old_location[1] + 2 or \
-                    new_location[1] == self._old_location[1] - 2:
+            if isinstance(selected_peice, Pawn) and \
+                    (new_location[1] == self._old_location[1] + 2 or
+                     new_location[1] == self._old_location[1] - 2):
                 self.enpassant(selected_peice, True)
             else:
                 # reset enpassant to false
@@ -380,6 +381,7 @@ class Board():
                 if location == peice.location:
                     self._black_pieces.remove(peice)
                     self._captured.append(peice)
+                    break
 
         elif color == "black":
             # checks oppisite peces for occupying the peice in the location
@@ -387,6 +389,7 @@ class Board():
                 if location == peice.location:
                     self._white_pieces.remove(peice)
                     self._captured.append(peice)
+                    break
 
     def is_in_check(self, turn: str) -> bool:
         """checks to see if opposite king is in check
@@ -519,13 +522,18 @@ class Board():
         if color == "white":
             temp_location = self._white_location
             temp_peice = self._white_pieces
-            enemy_location = self._black_location
+            enemies = self._black_pieces
+            tmp_enemies = self._black_pieces
+            tmp_enemy_location = self._black_location
 
         else:
             temp_location = self._black_location
             temp_peice = self._black_pieces
-            enemy_location = self._white_location
+            enemies = self._white_pieces
+            tmp_enemies = self._white_pieces
+            tmp_enemy_location = self._white_location
 
+        tmp_enemy = None
         check_move = moves
         moves = []
         safe = True
@@ -539,18 +547,23 @@ class Board():
             # adds possible location
             temp_location.append(coord)
             temp_peice.append(peice_type)
-
+            capture_check = False
             # adds capture
-            if coord in enemy_location:
-                moves.append(coord)
+            for enemy_peice in enemies:
+                if enemy_peice.location == coord:
+                    tmp_enemy = enemy_peice
+                    capture_check = True
+                    tmp_enemy_location.remove(tmp_enemy.location)
+                    tmp_enemies.remove(tmp_enemy)
+
             # checks if king is safe with new location
-            elif color == "white":
-                safe = self._white_king.is_safe(self._black_location, temp_location,
-                                                self._black_pieces, temp_peice,
+            if color == "white":
+                safe = self._white_king.is_safe(tmp_enemy_location, temp_location,
+                                                tmp_enemies, temp_peice,
                                                 self._white_king.location)
             else:
-                safe = self._black_king.is_safe(temp_location, self._white_location,
-                                                temp_peice, self._white_pieces,
+                safe = self._black_king.is_safe(temp_location, tmp_enemy_location,
+                                                temp_peice, tmp_enemies,
                                                 self._black_king.location)
             # if king is safe then add coord to moves
             if safe:
@@ -558,7 +571,10 @@ class Board():
             # removes new pece infomation
             temp_location.remove(coord)
             temp_peice.remove(peice_type)
-
+            # adds back in capture
+            if capture_check:
+                tmp_enemy_location.append(tmp_enemy.location)
+                tmp_enemies.append(tmp_enemy)
         # restores original pece and peice location
         temp_location.append(peice.location)
         temp_peice.append(peice)

@@ -15,7 +15,7 @@ WIDTH = 1600
 HEIGHT = 900
 
 
-def main():
+def main() -> None:
     """main game setup and loop"""
     # creates pygame screen
     screen = pygame.display.set_mode([WIDTH, HEIGHT])
