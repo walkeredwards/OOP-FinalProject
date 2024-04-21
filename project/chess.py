@@ -40,7 +40,7 @@ Chess Board Initial Layout
 
 """ Types of pieces which all have different move sets."""
 class Bishop():
-    # Can move diagonally
+    # Can move diagonallypop
     def __init__(self, name: str, color: str, x: int, y: int) -> None:
         self._name = name
         self._color = color
@@ -742,11 +742,9 @@ class Board:
                     if(quit_text_rect.collidepoint(event.pos)):
                         pygame.quit()
                     elif(play_text_rect.collidepoint(event.pos)):
-                        global done
                         # Add code to reset board and restart the game.
                         print("Start game over.")
-                        done = True
-                        chosen = True
+
 
     def movePiece(turn: str):
         """ Function that handles clicking on a piece and moving it to another square."""
