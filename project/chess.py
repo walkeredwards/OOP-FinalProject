@@ -40,7 +40,7 @@ Chess Board Initial Layout
 
 """ Types of pieces which all have different move sets."""
 class Bishop():
-    # Can move diagonallypop
+    # Can move diagonally
     def __init__(self, name: str, color: str, x: int, y: int) -> None:
         self._name = name
         self._color = color

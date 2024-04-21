@@ -1,10 +1,16 @@
-"""contians the pieces objects for chess game"""
+#! /usr/bin/env python3
+
+__authors__ = "Bryleigh Koci, Walker Edwards, Elena Schmitt"
+__date__ = "26 April 2024"
+__license__ = "MIT"
+
+""" Contains the pieces objects for chess game"""
 
 import pygame
 
 
 class Piece():
-    """base class for pieces"""
+    """ Base class for pieces"""
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         self._color = color
         self._location = location
@@ -71,10 +77,10 @@ class Piece():
 
 # Types of pieces which all have different move sets.
 class Pawn(Piece):
-    """pawn class"""
+    """Pawn class"""
     # Can move 2 spaces forward on first move, but only 1 space after.
-    # capture one space diaganal
-    # promote when reach end
+    # Capture one space diaganal
+    # Promote when reach end
     # En passant
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
@@ -103,12 +109,12 @@ class Pawn(Piece):
                         self._location[1] == 6:
                     possible_moves.append(target)
 
-            # left diag capture
+            # left diagonal capture
             target = (self._location[0] + 1, self._location[1] - 1)
             if target in enemy_locations:
                 possible_moves.append(target)
 
-            # right diag capture
+            # right diagonal capture
             target = (self._location[0] - 1, self._location[1] - 1)
             if target in enemy_locations:
                 possible_moves.append(target)
@@ -252,9 +258,9 @@ class Bishop(Piece):
 
 
 class Knight(Piece):
-    """knight class"""
+    """ Knight class"""
     # Can move in an L shape (e.g. up/down 2, over 1)
-    # can jump over pieces
+    # Can jump over pieces
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
         self._image = pygame.transform.scale(
@@ -286,10 +292,10 @@ class Knight(Piece):
 
 
 class Rook(Piece):
-    """rook class"""
+    """Rook class"""
     # Can move horizontally or vertically
     def __init__(self, color: str, location: tuple[int, int]) -> None:
-        """initalization
+        """Initalization
 
         Args:
             color (str): color of piece
@@ -302,7 +308,7 @@ class Rook(Piece):
 
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
-        """finds all the possible moves
+        """Finds all the possible moves
 
         Args:
             b_location (list): list of black piece locations

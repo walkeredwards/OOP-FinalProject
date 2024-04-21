@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
-__authors__ = ""
-__date__ = ""
-__license__ = ""
+__authors__ = "Bryleigh Koci, Walker Edwards, Elena Schmitt"
+__date__ = "26 April 2024"
+__license__ = "MIT"
 
 import pygame
 from board import Board
@@ -10,17 +10,17 @@ from player import Player
 
 pygame.init()
 
-# hight and width for window
+# Height and width for window
 WIDTH = 1600
 HEIGHT = 900
 
 # Main function with game loop
 def main() -> None:
-    """main game setup and loop"""
-    # creates pygame screen
+    """ Main game setup and loop"""
+    # Creates pygame screen
     screen = pygame.display.set_mode([WIDTH, HEIGHT])
     pygame.display.set_caption("Chess")
-    # sets fps
+    # Sets fps for screen
     timer = pygame.time.Clock()
     fps = 60
 
@@ -28,23 +28,23 @@ def main() -> None:
     font = pygame.font.Font('font/ka1.ttf', 30)
     font_title = pygame.font.Font('font/ka1.ttf', 100)
 
-    # creates player class
+    # Creates player class for each player
     player_1 = Player("white")
     player_2 = Player("black")
 
-    # setup game
+    # Setup game
     running: bool = True
     turn: str = "white"
 
     game = Board(WIDTH, HEIGHT)
     game.setup_pieces()
 
-    # draws board
+    # Draws board
     screen.fill("black")
     game.make_board(screen)
     game.draw_pieces(screen)
 
-    # game loop
+    # Game loop
     while running:
         timer.tick(fps)
 
@@ -56,53 +56,50 @@ def main() -> None:
         # Takes care of keyboard/mouse input
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN and turn == "white":
-                # mouse click player 1
-                # gets coord of player click
+                # Handles mouse click for player 1 and gets coordinates of player click
                 click = player_1.click(WIDTH, HEIGHT)
 
                 if player_1.selected_piece_info is None:
-                    # takes location and checks if a player piece is there
+                    # Takes location and checks if a player piece is there
                     player_1.selected_piece_info = game.select(turn, click)
                 else:
-                    # if player has selected piece then check avalible moves
+                    # If player has selected piece then checks available moves
                     player_move = game.move(turn, player_1.selected_piece_info, click)
 
-                    # resets player selected
+                    # Resets player selected
                     player_1.selected_piece_info = None
 
                     if player_move:
-                        # if move is valid then switch turns
+                        # If move is valid then switch turns
                         turn = "black"
-                # draws the board after player click
+                # Redraws the board after player click to show updated locations
                 game.make_board(screen)
                 game.highlight_selected(player_1.selected_piece_info, screen, turn)
                 game.draw_pieces(screen)
 
             elif event.type == pygame.MOUSEBUTTONDOWN and turn == "black":
-                # mouse click player 2
-                # gets coord of player click
+                # Handles mouse click for player 2 adn gets coordinates of player click
                 click = player_2.click(WIDTH, HEIGHT)
 
                 if player_2.selected_piece_info is None:
-
-                    # takes location and checks if piece is there
+                    # Gets location and checks if piece is there
                     player_2.selected_piece_info = game.select(turn, click)
 
                 else:
-                    # if player has selected piece then check avalible moves
+                    # If player has selected piece then check avalible moves
                     player_move = game.move(turn, player_2.selected_piece_info, click)
 
-                    # resets player selected
+                    # Resets player selected piece
                     player_2.selected_piece_info = None
 
                     if player_move:
-                        # if move is valid then switch turns
+                        # If move is valid then switch turns
                         turn = "white"
-                # draws the board after player click
+                # Redraws the board after player click to show updated locations
                 game.make_board(screen)
                 game.highlight_selected(player_2.selected_piece_info, screen, turn)
                 game.draw_pieces(screen)
-            # exit window
+            # Exits the window
             if event.type == pygame.QUIT:
                 running = False
 
