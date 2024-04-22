@@ -36,10 +36,9 @@ def main() -> None:
     game.setup_pieces()
 
     # draws board
-    screen.fill("black")
     game.make_board(screen)
     game.draw_pieces(screen)
-
+    print(type(screen))
     # game loop
     while running:
         timer.tick(fps)

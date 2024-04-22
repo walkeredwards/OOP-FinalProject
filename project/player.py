@@ -3,14 +3,15 @@
 import pygame
 # from collections.abc import Callable
 from peices import Piece
+from peices import King
 
 
 class Player():
     """player class"""
     def __init__(self, color: str) -> None:
         """initialization"""
-        self._color = color  # color black or white
-        self._selected_peice_info = None  # selected peice
+        self._color: str = color  # color black or white
+        self._selected_peice_info: Piece | None | King = None  # selected peice
 
     @property
     def color(self) -> str:
@@ -18,12 +19,12 @@ class Player():
         return self._color
 
     @property
-    def selected_peice_info(self) -> Piece:
+    def selected_peice_info(self) -> Piece | King | None:
         """getter for _selected_peice"""
         return self._selected_peice_info
 
     @selected_peice_info.setter
-    def selected_peice_info(self, peice: Piece) -> None:
+    def selected_peice_info(self, peice: Piece | King) -> None:
         """setter for _selected_peice_info"""
         self._selected_peice_info = peice
 
