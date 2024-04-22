@@ -747,10 +747,8 @@ class Board():
                     return False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if(quit_text_rect.collidepoint(event.pos)):
-                        print("Quitting Game")
                         return False
                     elif(play_text_rect.collidepoint(event.pos)):
                         # Add code to reset board and restart the game.
-                        print("Start game over.")
                         return True
 

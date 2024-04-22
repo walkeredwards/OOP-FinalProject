@@ -103,9 +103,7 @@ def main() -> None:
         else:
             previous_turn = "black" 
         if game.check_endgame_conditions(previous_turn):
-            print("Checkmate or stalemate detected. Calling end game popup...")
             game_over = game.draw_end_popup(screen)
-            print(f"Popup returned: {game_over}")
             if game_over:
                 screen.fill('black')
                 game = Board(WIDTH, HEIGHT)
