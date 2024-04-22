@@ -93,8 +93,16 @@ def main() -> None:
                 game.make_board(screen)
                 game.highlight_selected(player_2.selected_peice_info, screen, turn)
                 game.draw_pieces(screen)
-            # exit window
+            
             if event.type == pygame.QUIT:
+                running = False
+            
+        if game.check_endgame_conditions(turn):
+            game_over = game.draw_end_popup(screen)
+            if game_over:
+                game = Board(WIDTH, HEIGHT)
+                game.setup_pieces()
+            else:
                 running = False
 
         pygame.display.flip()
