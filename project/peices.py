@@ -8,7 +8,7 @@ class Piece():
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         self._color = color
         self._location = location
-        self._image = pygame.image.load('project/images/WhitePieces.png')
+        self._image = pygame.image.load('images/WhitePieces.png')
 
     @property
     def color(self) -> str:
@@ -80,7 +80,7 @@ class Pawn(Piece):
         super().__init__(color, location)
         self.enpassant = False
         self._image = pygame.transform.scale(
-            pygame.image.load('project/images/' + color + '/pawn.png'), (90, 120))
+            pygame.image.load('images/' + color + '/pawn.png'), (90, 120))
 
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
@@ -178,7 +178,7 @@ class Bishop(Piece):
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
         self._image = pygame.transform.scale(
-            pygame.image.load('project/images/' + color + '/bishop.png'), (90, 90))
+            pygame.image.load('images/' + color + '/bishop.png'), (90, 90))
 
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
@@ -261,7 +261,7 @@ class Knight(Piece):
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
         self._image = pygame.transform.scale(
-            pygame.image.load('project/images/' + color + '/knight.png'), (90, 90))
+            pygame.image.load('images/' + color + '/knight.png'), (90, 90))
 
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
@@ -301,7 +301,7 @@ class Rook(Piece):
         super().__init__(color, location)
         self.moved = False  # move for castle
         self._image = pygame.transform.scale(
-            pygame.image.load('project/images/' + color + '/rook.png'), (90, 90))
+            pygame.image.load('images/' + color + '/rook.png'), (90, 90))
 
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
@@ -442,7 +442,7 @@ class Queen(Piece):
         """
         super().__init__(color, location)
         self._image = pygame.transform.scale(
-            pygame.image.load('project/images/' + color + '/queen.png'), (90, 90))
+            pygame.image.load('images/' + color + '/queen.png'), (90, 90))
 
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
@@ -562,7 +562,7 @@ class King(Piece):
         super().__init__(color, location)
         self.moved = False  # for castle
         self._image = pygame.transform.scale(
-            pygame.image.load('project/images/' + color + '/king.png'), (90, 90))
+            pygame.image.load('images/' + color + '/king.png'), (90, 90))
 
     def possible_moves(self, b_location: list[tuple[int, int]], w_location: list[tuple[int, int]],
                        b_peice: list[Piece], w_peice: list[Piece],

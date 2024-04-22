@@ -666,7 +666,7 @@ class Board():
 
         return stalemate
 
-    def check_endgame_conditions(self, color: str) -> None:
+    def check_endgame_conditions(self, color: str) -> bool:
         """checks for checkmate and stalemate and ends game if eyther are true
 
         Args:
@@ -692,8 +692,11 @@ class Board():
         # if one end game conditions are met end game
         if checkmate:
             self.end_game(color)
+            return True
         elif stalemate:
             self.end_game(color)
+            return True
+        return False
 
     def end_game(self, winner: str) -> None:
         # replace
@@ -744,6 +747,7 @@ class Board():
                     return False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if(quit_text_rect.collidepoint(event.pos)):
+                        print("Quitting Game")
                         return False
                     elif(play_text_rect.collidepoint(event.pos)):
                         # Add code to reset board and restart the game.

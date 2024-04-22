@@ -96,12 +96,22 @@ def main() -> None:
             
             if event.type == pygame.QUIT:
                 running = False
-            
-        if game.check_endgame_conditions(turn):
+        
+        
+        if turn == "black":
+            previous_turn = "white"
+        else:
+            previous_turn = "black" 
+        if game.check_endgame_conditions(previous_turn):
+            print("Checkmate or stalemate detected. Calling end game popup...")
             game_over = game.draw_end_popup(screen)
+            print(f"Popup returned: {game_over}")
             if game_over:
+                screen.fill('black')
                 game = Board(WIDTH, HEIGHT)
                 game.setup_pieces()
+                game.make_board(screen)
+                game.draw_pieces(screen)
             else:
                 running = False
 
