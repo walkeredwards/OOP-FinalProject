@@ -36,13 +36,13 @@ def main() -> None:
     running: bool = True
     turn: str = "white"
 
-    game = Board(WIDTH, HEIGHT)
+    game = Board(WIDTH, HEIGHT, screen)
     game.setup_pieces()
 
     # Draws board
     screen.fill("black")
-    game.make_board(screen)
-    game.draw_pieces(screen)
+    game.make_board()
+    game.draw_pieces()
 
     # Game loop
     while running:
@@ -73,9 +73,9 @@ def main() -> None:
                         # If move is valid then switch turns
                         turn = "black"
                 # Redraws the board after player click to show updated locations
-                game.make_board(screen)
-                game.highlight_selected(player_1.selected_piece_info, screen, turn)
-                game.draw_pieces(screen)
+                game.make_board()
+                game.highlight_selected(player_1.selected_piece_info, turn)
+                game.draw_pieces()
 
             elif event.type == pygame.MOUSEBUTTONDOWN and turn == "black":
                 # Handles mouse click for player 2 adn gets coordinates of player click
@@ -96,9 +96,9 @@ def main() -> None:
                         # If move is valid then switch turns
                         turn = "white"
                 # Redraws the board after player click to show updated locations
-                game.make_board(screen)
-                game.highlight_selected(player_2.selected_piece_info, screen, turn)
-                game.draw_pieces(screen)
+                game.make_board()
+                game.highlight_selected(player_2.selected_piece_info, turn)
+                game.draw_pieces()
             # Exits the window
             if event.type == pygame.QUIT:
                 running = False

@@ -38,7 +38,7 @@ from pieces import Pawn
 
 class Board():
     """ Class that handles setting up the board and placing the pieces and the functions necessary to do that."""
-    def __init__(self, width, height) -> None:
+    def __init__(self, width, height, screen) -> None:
         """ Board initializer
 
         Args:
@@ -64,6 +64,9 @@ class Board():
         self._enpassant = False
         # Invisible pawn that will allow enpassant
         self._enpassant_pawn = None
+        
+        # Set up screen
+        self._screen = screen
 
     # Set up the chess pieces on the board
     def setup_pieces(self) -> None:
@@ -122,51 +125,51 @@ class Board():
         # Updates locations for all pieces
         self.update_locations()
 
-    def make_board(self, screen) -> None:
+    def make_board(self) -> None:
         """ Set up the squares on the board
 
         Args:
             screen : pygame screen
         """
-        screen.fill('black')
+        self._screen.fill('black')
         # Set w and h for board to be in middle of the screen
         w = (self._width - 800) // 2
         h = (self._height - 800) // 2
 
         # White border around board
-        pygame.draw.rect(screen, 'white', [395, 45, 810, 810])
+        pygame.draw.rect(self._screen, 'white', [395, 45, 810, 810])
 
         for row in range(8):
             for col in range(8):
                 if (row + col) % 2 == 0:
                     # Even squares will be black
-                    pygame.draw.rect(screen, 'white', [w + col * 100, h + row * 100, 100, 100])
+                    pygame.draw.rect(self._screen, 'white', [w + col * 100, h + row * 100, 100, 100])
                 else:
                     # Odd squares will be white
-                    pygame.draw.rect(screen, 'black', [w + col * 100, h + row * 100, 100, 100])
+                    pygame.draw.rect(self._screen, 'black', [w + col * 100, h + row * 100, 100, 100])
 
 
         # Highlights the most recent piece moved and it's old location
         if self._last_piece_moved is not None:
             if (self._last_piece_moved.color == "black"):
-                pygame.draw.rect(screen, 'green', [w + self._old_location[0] * 100,
+                pygame.draw.rect(self._screen, 'green', [w + self._old_location[0] * 100,
                                                         h + self._old_location[1] * 100, 100, 100])
-                pygame.draw.rect(screen, 'green', [w + self._last_piece_moved.location[0] * 100,
+                pygame.draw.rect(self._screen, 'green', [w + self._last_piece_moved.location[0] * 100,
                                                         h + self._last_piece_moved.location[1] * 100,
                                                        100, 100])
             else:
-                pygame.draw.rect(screen, 'hot pink', [w + self._old_location[0] * 100,
+                pygame.draw.rect(self._screen, 'hot pink', [w + self._old_location[0] * 100,
                                                         h + self._old_location[1] * 100, 100, 100])
-                pygame.draw.rect(screen, 'hot pink', [w + self._last_piece_moved.location[0] * 100,
+                pygame.draw.rect(self._screen, 'hot pink', [w + self._last_piece_moved.location[0] * 100,
                                                         h + self._last_piece_moved.location[1] * 100,
                                                        100, 100])
 
         # Highlights king in check with red
         if self._in_check is not None:
-            pygame.draw.rect(screen, 'red', [w + self._in_check.location[0] * 100,
+            pygame.draw.rect(self._screen, 'red', [w + self._in_check.location[0] * 100,
                                              h + self._in_check.location[1] * 100, 100, 100])
 
-    def highlight_selected(self, selected_piece, screen, turn: str) -> None:
+    def highlight_selected(self, selected_piece, turn: str) -> None:
         """ If player selected piece is not none then highlight 
             all possible locations it can move to.
 
@@ -209,17 +212,14 @@ class Board():
             # Highlights the available moves for the current selected piece.
             for tile in moves:
                 if(turn == "black"):
-                    pygame.draw.rect(screen, 'green', [w + selected_piece.location[0] * 100, h + selected_piece.location[1] * 100, 100, 100])
-                    pygame.draw.rect(screen, 'green', [w + tile[0] * 100, h + tile[1] * 100, 100, 100], 3)
+                    pygame.draw.rect(self._screen, 'green', [w + selected_piece.location[0] * 100, h + selected_piece.location[1] * 100, 100, 100])
+                    pygame.draw.rect(self._screen, 'green', [w + tile[0] * 100, h + tile[1] * 100, 100, 100], 3)
                 else:
-                    pygame.draw.rect(screen, 'hot pink', [w + selected_piece.location[0] * 100, h + selected_piece.location[1] * 100, 100, 100])
-                    pygame.draw.rect(screen, 'hot pink', [w + tile[0] * 100, h + tile[1] * 100, 100, 100], 3)
+                    pygame.draw.rect(self._screen, 'hot pink', [w + selected_piece.location[0] * 100, h + selected_piece.location[1] * 100, 100, 100])
+                    pygame.draw.rect(self._screen, 'hot pink', [w + tile[0] * 100, h + tile[1] * 100, 100, 100], 3)
 
-    def draw_pieces(self, screen):
+    def draw_pieces(self):
         """ Draws the pieces onto the board
-
-        Args:
-            screen: pygame screen
         """
         # Finds the starting corner for the board
         w = (self._width - 800) // 2
@@ -228,12 +228,12 @@ class Board():
         # Draws white pieces
         for piece in self._white_pieces:
             xy_location = piece.location
-            screen.blit(piece.image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
+            self._screen.blit(piece.image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
 
         # Draws black pieces
         for piece in self._black_pieces:
             xy_location = piece.location
-            screen.blit(piece.image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
+            self._screen.blit(piece.image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
 
         # Draws captured pieces to the side
         white_capture_count = 0  # Counts amount of captured white that have been drawn
@@ -243,17 +243,17 @@ class Board():
             if piece.color == "white":
                 # ammount in one row before going down
                 if white_capture_count < 7:
-                    screen.blit(piece.image, (10 + white_capture_count * 35, h + 0 * 100))
+                    self._screen.blit(piece.image, (10 + white_capture_count * 35, h + 0 * 100))
                 else:
-                    screen.blit(piece.image, (10 + (white_capture_count - 7) * 35,
+                    self._screen.blit(piece.image, (10 + (white_capture_count - 7) * 35,
                                               (h * 1.5) + 0 * 100))
                 white_capture_count += 1
             elif piece.color == "black":
                 # ammount in one row before going down
                 if black_capture_count < 7:
-                    screen.blit(piece.image, (10 + black_capture_count * 35, h + 7 * 100))
+                    self._screen.blit(piece.image, (10 + black_capture_count * 35, h + 7 * 100))
                 else:
-                    screen.blit(piece.image, (10 + (black_capture_count - 7) * 35,
+                    self._screen.blit(piece.image, (10 + (black_capture_count - 7) * 35,
                                               (h * 1.5) + 7 * 100))
                 black_capture_count += 1
 
@@ -389,7 +389,7 @@ class Board():
             self._enpassant = False
             self._enpassant_pawn = None
 
-    def promotion(piece, screen) -> None:
+    def promotion(piece) -> None:
         """
         If pawn reaches end of board, player can promote to piece of choosing.
         
@@ -400,7 +400,7 @@ class Board():
         w = (self._width - 800) // 2
         h = (self._height - 800) // 2
 
-        screen.fill((0, 0, 0))
+        self._screen.fill((0, 0, 0))
         font_title = pygame.font.Font('font/ka1.ttf', 70)
 
         if (piece._color == 'white'):
@@ -410,34 +410,34 @@ class Board():
 
         message = font_title.render("Choose a piece to promote", True, font_color)
         message_rect = message.get_rect(center = (self._width // 2, self._height // 3))
-        screen.blit(message, message_rect)
+        self._screen.blit(message, message_rect)
 
         # Draw background rects for pieces
         x_pos = 350
         for i in range(5):
-            pygame.draw.rect(screen, font_color, [x_pos, 400, 100, 100])
+            pygame.draw.rect(self._screen, font_color, [x_pos, 400, 100, 100])
             x_pos += 200
 
         # Draw queen option
         queen_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/queen.png'), (90, 90))
         queen_rect = queen_image.get_rect(topleft=(350, 400))
-        screen.blit(queen_image, queen_rect)
+        self._screen.blit(queen_image, queen_rect)
         # Draw bishop option
         bishop_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/bishop.png'), (90, 90))
         bishop_rect = bishop_image.get_rect(topleft=(550, 400))
-        screen.blit(bishop_image, bishop_rect)
+        self._screen.blit(bishop_image, bishop_rect)
         # Draw rook option
         rook_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/rook.png'), (90, 90))
         rook_rect = rook_image.get_rect(topleft=(750, 400))
-        screen.blit(rook_image, rook_rect)
+        self._screen.blit(rook_image, rook_rect)
         # Draw knight option
         knight_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/knight.png'), (90, 90))
         knight_rect = knight_image.get_rect(topleft=(950, 400))
-        screen.blit(knight_image, knight_rect)
+        self._screen.blit(knight_image, knight_rect)
         # Draw pawn option
         pawn_image = pygame.transform.scale(pygame.image.load('images/' + piece._color + '/pawn.png'), (90, 90))
         pawn_rect = pawn_image.get_rect(topleft=(1150, 400))
-        screen.blit(pawn_image, pawn_rect)
+        self._screen.blit(pawn_image, pawn_rect)
 
         pygame.display.flip()
 
@@ -836,7 +836,7 @@ class Board():
         w = (self._width - 800) // 2
         h = (self._height - 800) // 2
 
-        screen.fill((255, 255, 255))
+        self._screen.fill((255, 255, 255))
 
         font_header = pygame.font.Font('font/ka1.ttf', 100)
         font_title = pygame.font.Font('font/ka1.ttf', 70)
@@ -846,8 +846,8 @@ class Board():
         gameover_rect = gameover.get_rect(center = (self._width // 2, self._height // 5))
         message = font_title.render("Do you want to play again?", True, 'black')
         message_rect = message.get_rect(center = (self._width // 2, self._height // 3))
-        screen.blit(gameover, gameover_rect)
-        screen.blit(message, message_rect)
+        self._screen.blit(gameover, gameover_rect)
+        self._screen.blit(message, message_rect)
 
         button_w = 150
         button_h = 50
@@ -856,16 +856,16 @@ class Board():
         play_button_x = (self._width - button_w - 250) // 2
         quit_button_x = (self._width + 100) // 2
 
-        pygame.draw.rect(screen, 'green', [500, button_y, 350, button_h])
-        pygame.draw.rect(screen, 'red', [quit_button_x, button_y, button_w, button_h])
+        pygame.draw.rect(self._screen, 'green', [500, button_y, 350, button_h])
+        pygame.draw.rect(self._screen, 'red', [quit_button_x, button_y, button_w, button_h])
 
         play_text = font.render("Play Again", True, 'black')
         play_text_rect = play_text.get_rect(center=(play_button_x + button_w // 2, button_y + button_h // 2))
-        screen.blit(play_text, play_text_rect)
+        self._screen.blit(play_text, play_text_rect)
 
         quit_text = font.render("Quit", True, 'black')
         quit_text_rect = quit_text.get_rect(center=(quit_button_x + button_w // 2, button_y + button_h // 2))
-        screen.blit(quit_text, quit_text_rect)
+        self._screen.blit(quit_text, quit_text_rect)
 
         pygame.display.flip()
 
