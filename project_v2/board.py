@@ -353,6 +353,12 @@ class Board():
             self._old_location = last_location
             self._last_piece_moved = selected_piece
 
+            if isinstance(selected_piece, Pawn):
+                if (selected_piece.color == 'black' and selected_piece.location[1] == 7):
+                    self.promotion(selected_piece)
+                elif (selected_piece.color == 'white' and selected_piece.location[1] == 0):
+                    self.promotion(selected_piece)
+
             # If a pawn moved 2 tile set up for enpassant
             if isinstance(selected_piece, Pawn) and \
                     (new_location[1] == self._old_location[1] + 2 or
@@ -389,7 +395,7 @@ class Board():
             self._enpassant = False
             self._enpassant_pawn = None
 
-    def promotion(piece) -> None:
+    def promotion(self, piece) -> None:
         """
         If pawn reaches end of board, player can promote to piece of choosing.
         
@@ -449,51 +455,50 @@ class Board():
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     x, y = pygame.mouse.get_pos()
                     # Save x and y of current pawn
-                    x_coord = piece.x
-                    y_coord = piece.y
+                    coords = piece.location
                     if (queen_rect.collidepoint(event.pos)):
                         if (piece._color == 'white'):
-                            white_pieces.remove(piece)
-                            promoted_piece = Queen("White_Queen_Promoted", "white", x_coord, y_coord)
-                            white_pieces.append(promoted_piece)
+                            self._white_pieces.remove(piece)
+                            promoted_piece = Queen("white", coords)
+                            self._white_pieces.append(promoted_piece)
                             promoted = True
                         else:
-                            black_pieces.remove(piece)
-                            promoted_piece = Queen("Black_Queen_Promoted", "black", x_coord, y_coord)
-                            black_pieces.append(promoted_piece)
+                            self._black_pieces.remove(piece)
+                            promoted_piece = Queen("black", coords)
+                            self._black_pieces.append(promoted_piece)
                             promoted = True
                     elif (bishop_rect.collidepoint(event.pos)):
                         if (piece._color == 'white'):
-                            white_pieces.remove(piece)
-                            promoted_piece = Bishop("White_Bishop_Promoted", "white", x_coord, y_coord)
-                            white_pieces.append(promoted_piece)
+                            self._white_pieces.remove(piece)
+                            promoted_piece = Bishop("white", coords)
+                            self._white_pieces.append(promoted_piece)
                             promoted = True
                         else:
-                            black_pieces.remove(piece)
-                            promoted_piece = Bishop("Black_Bishop_Promoted", "black", x_coord, y_coord)
-                            black_pieces.append(promoted_piece)
+                            self._black_pieces.remove(piece)
+                            promoted_piece = Bishop("black", coords)
+                            self._black_pieces.append(promoted_piece)
                             promoted = True
                     elif (rook_rect.collidepoint(event.pos)):
                         if (piece._color == 'white'):
-                            white_pieces.remove(piece)
-                            promoted_piece = Rook("White_Rook_Promoted", "white", x_coord, y_coord, True)
-                            white_pieces.append(promoted_piece)
+                            self._white_pieces.remove(piece)
+                            promoted_piece = Rook("white", coords)
+                            self._white_pieces.append(promoted_piece)
                             promoted = True
                         else:
-                            black_pieces.remove(piece)
-                            promoted_piece = Rook("Black_Rook_Promoted", "black", x_coord, y_coord, True)
-                            black_pieces.append(promoted_piece)
+                            self._black_pieces.remove(piece)
+                            promoted_piece = Rook("black", coords)
+                            self._black_pieces.append(promoted_piece)
                             promoted = True
                     elif (knight_rect.collidepoint(event.pos)):
                         if (piece._color == 'white'):
-                            white_pieces.remove(piece)
-                            promoted_piece = Knight("White_Knight_Promoted", "white", x_coord, y_coord)
-                            white_pieces.append(promoted_piece)
+                            self._white_pieces.remove(piece)
+                            promoted_piece = Knight("white", coords)
+                            self._white_pieces.append(promoted_piece)
                             promoted = True
                         else:
-                            black_pieces.remove(piece)
-                            promoted_piece = Knight("Black_Knight_Promoted", "black", x_coord, y_coord)
-                            black_pieces.append(promoted_piece)
+                            self._black_pieces.remove(piece)
+                            promoted_piece = Knight("black", coords)
+                            self._black_pieces.append(promoted_piece)
                             promoted = True
                     elif (pawn_rect.collidepoint(event.pos)):
                         promoted = True
@@ -797,8 +802,8 @@ class Board():
 
         return stalemate
 
-    def check_endgame_conditions(self, color: str) -> None:
-        """ Checks for checkmate and stalemate and ends game if either are true.
+    def check_endgame_conditions(self, color: str) -> bool:
+        """checks for checkmate and stalemate and ends game if eyther are true
 
         Args:
             color (str): color that just moved
@@ -807,26 +812,29 @@ class Board():
         stalemate = False
         checkmate = False
 
-        # If king is in check
+        # if king is in check
         if check and color == "white":
-            self._in_check = self._black_king  # Set king to in check
-            checkmate = self.check_checkmate("black")  # Check for check
+            self._in_check = self._black_king  # set king to in check
+            checkmate = self.check_checkmate("black")  # check for check
         elif check and color == "black":
-            self._in_check = self._white_king  # Set king to in check
-            checkmate = self.check_checkmate("white")  # Check for check
+            self._in_check = self._white_king  # set king to in check
+            checkmate = self.check_checkmate("white")  # check for check
         else:
-            # King is not in check
+            # king is not in check
             self._in_check = None
             checkmate = False
-            stalemate = self.check_stalemate(color)  # Check for stalemate
+            stalemate = self.check_stalemate(color)  # check for stalemate
 
-        # If one end game conditions are met end game
+        # if one end game conditions are met end game
         if checkmate:
             self.end_game(color)
+            return True
         elif stalemate:
             self.end_game(color)
+            return True
+        return False
 
-    def end_game(self, winner: str) -> None:
+    def end_game(self, winner: str) -> bool:
         # Replace with end game popup code. Need to pass through screen to be able to blit.
         if self._in_check is not None:
             print(f"{winner} Wins")
@@ -842,10 +850,19 @@ class Board():
         font_title = pygame.font.Font('font/ka1.ttf', 70)
         font = pygame.font.Font('font/ka1.ttf', 36)
 
+        if (winner == 'black'):
+            win = font_header.render("BLACK WINS", True, 'green')
+            win_rect = win.get_rect(center = (self._width // 2, self._height // 3))
+            self._screen.blit(win, win_rect)
+        else:
+            win = font_header.render("WHITE WINS", True, 'hot pink')
+            win_rect = win.get_rect(center = (self._width // 2, self._height // 3))
+            self._screen.blit(win, win_rect)
+        
         gameover = font_header.render("GAME OVER", True, 'red')
         gameover_rect = gameover.get_rect(center = (self._width // 2, self._height // 5))
         message = font_title.render("Do you want to play again?", True, 'black')
-        message_rect = message.get_rect(center = (self._width // 2, self._height // 3))
+        message_rect = message.get_rect(center = (self._width // 2, self._height // 2))
         self._screen.blit(gameover, gameover_rect)
         self._screen.blit(message, message_rect)
 
@@ -856,8 +873,8 @@ class Board():
         play_button_x = (self._width - button_w - 250) // 2
         quit_button_x = (self._width + 100) // 2
 
-        pygame.draw.rect(self._screen, 'green', [500, button_y, 350, button_h])
-        pygame.draw.rect(self._screen, 'red', [quit_button_x, button_y, button_w, button_h])
+        replay_rect = pygame.draw.rect(self._screen, 'green', [500, button_y, 350, button_h])
+        quit_rect = pygame.draw.rect(self._screen, 'red', [quit_button_x, button_y, button_w, button_h])
 
         play_text = font.render("Play Again", True, 'black')
         play_text_rect = play_text.get_rect(center=(play_button_x + button_w // 2, button_y + button_h // 2))
@@ -869,14 +886,13 @@ class Board():
 
         pygame.display.flip()
 
-        chosen = False
-        while not chosen:
+        while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
+                    return False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if(quit_text_rect.collidepoint(event.pos)):
-                        pygame.quit()
-                    elif(play_text_rect.collidepoint(event.pos)):
+                    if(quit_rect.collidepoint(event.pos)):
+                        return False
+                    elif(replay_rect.collidepoint(event.pos)):
                         # Add code to reset board and restart the game.
-                        print("Start game over.")
+                        return True
