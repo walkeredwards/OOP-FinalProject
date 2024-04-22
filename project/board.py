@@ -345,7 +345,7 @@ class Board():
             # update peice locations
             self.update_locations()
             # check if any endgame conditions are met
-            self.check_endgame_conditions(color)
+            #self.check_endgame_conditions(color)
 
         return move
 

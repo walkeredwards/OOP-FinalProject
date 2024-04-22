@@ -101,7 +101,7 @@ def main() -> None:
         if turn == "black":
             previous_turn = "white"
         else:
-            previous_turn = "black" 
+            previous_turn = "black"
         if game.check_endgame_conditions(previous_turn):
             game_over = game.draw_end_popup(screen)
             if game_over:
@@ -110,6 +110,7 @@ def main() -> None:
                 game.setup_pieces()
                 game.make_board(screen)
                 game.draw_pieces(screen)
+                turn = 'white'
             else:
                 running = False
 
