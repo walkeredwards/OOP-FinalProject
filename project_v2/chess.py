@@ -14,6 +14,8 @@ pygame.init()
 WIDTH = 1600
 HEIGHT = 900
 
+# flake8: noqa: C901
+
 
 def main() -> None:
     """main game setup and loop"""
@@ -26,7 +28,6 @@ def main() -> None:
 
     # Set up fonts
     font = pygame.font.Font('font/ka1.ttf', 30)
-    font_title = pygame.font.Font('font/ka1.ttf', 100)
 
     # creates player class
     player_1 = Player("white")
@@ -48,7 +49,7 @@ def main() -> None:
     while running:
         timer.tick(fps)
 
-        if(turn == "black"):
+        if (turn == "black"):
             screen.blit(font.render("BLACK'S TURN", False, 'green'), (660, 5))
         else:
             screen.blit(font.render("WHITE'S TURN", False, 'hot pink'), (660, 860))
@@ -102,14 +103,14 @@ def main() -> None:
                 game.make_board()
                 game.highlight_selected(player_2.selected_piece_info, turn)
                 game.draw_pieces()
-            
-            if event.type == pygame.QUIT:
+
+            if (event.type == pygame.QUIT):
                 running = False
-        
+
         if turn == "black":
             previous_turn = "white"
         else:
-            previous_turn = "black" 
+            previous_turn = "black"
         if game.check_endgame_conditions(previous_turn):
             print("Checkmate or stalemate detected. Calling end game popup...")
             game_over = game.end_game(previous_turn)

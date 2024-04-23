@@ -13,6 +13,7 @@ from pieces import Piece
 
 class Player():
     """ Player class"""
+
     def __init__(self, color: str) -> None:
         """ Initialization"""
         self._color = color  # Color black or white

@@ -11,6 +11,7 @@ import pygame
 
 class Piece():
     """ Base class for pieces"""
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         self._color = color
         self._location = location
@@ -82,6 +83,7 @@ class Pawn(Piece):
     # Capture one space diaganal
     # Promote when reach end
     # En passant
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
         self.enpassant = False
@@ -178,6 +180,7 @@ class Pawn(Piece):
 class Bishop(Piece):
     """Bishop class"""
     # Can move diagonally
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
         self._image = pygame.transform.scale(
@@ -261,6 +264,7 @@ class Knight(Piece):
     """ Knight class"""
     # Can move in an L shape (e.g. up/down 2, over 1)
     # Can jump over pieces
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
         self._image = pygame.transform.scale(
@@ -294,6 +298,7 @@ class Knight(Piece):
 class Rook(Piece):
     """Rook class"""
     # Can move horizontally or vertically
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         """Initalization
 
@@ -436,6 +441,7 @@ class Rook(Piece):
 class Queen(Piece):
     """queen class"""
     # Can move horizontally, vertically and/or diagonally
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         """initialization for queen
 
@@ -555,6 +561,7 @@ class King(Piece):
     """king class"""
     # Can only move to one of the 8 squares directly surrounding it
     # castle only if: clear path to rook, the two haven't moved, does not go through check
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         """initalization
 
