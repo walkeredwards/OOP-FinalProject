@@ -6,7 +6,7 @@ __license__ = "MIT"
 
 """ Contains the pieces objects for chess game"""
 
-import pygame
+import pygame  # type: ignore
 
 
 class Piece():

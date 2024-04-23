@@ -4,7 +4,7 @@ __authors__ = ""
 __date__ = ""
 __license__ = ""
 
-import pygame
+import pygame  # type: ignore
 from board import Board
 from player import Player
 

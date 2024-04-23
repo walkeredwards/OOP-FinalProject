@@ -27,7 +27,9 @@ Chess Board Initial Layout
   WR     WK     WB     WQ     WK     WB     WK     WR
 """
 
-import pygame
+import pygame  # type: ignore
+from typing import List, Tuple, Any
+from pieces import Piece
 from pieces import Rook
 from pieces import Knight
 from pieces import Bishop
@@ -40,7 +42,7 @@ class Board():
     """ Class that handles setting up the board and placing the pieces and the functions
         necessary to do that."""
 
-    def __init__(self, width, height, screen) -> None:
+    def __init__(self, width: int, height: int, screen: pygame.surface.Surface) -> None:
         """ Board initializer
 
         Args:
@@ -49,11 +51,11 @@ class Board():
         """
         self._width: int = width  # Width of pygame screen
         self._height: int = height  # Height of pygame screen
-        self._white_pieces: list = []  # List of all white pieces
-        self._black_pieces: list = []  # List of all black pieces
-        self._white_location: list = []  # List of white piece locations
-        self._black_location: list = []  # List of black piece locations
-        self._captured: list = []  # List of captured pieces
+        self._white_pieces: List[Piece] = []  # List of all white pieces
+        self._black_pieces: List[Piece] = []  # List of all black pieces
+        self._white_location: List[Tuple[int, int]] = []  # List of white piece locations
+        self._black_location: List[Tuple[int, int]] = []  # List of black piece locations
+        self._captured: List[Piece] = []  # List of captured pieces
 
         # Stores the old location of the piece that was most recently moved
         self._old_location = None
@@ -233,7 +235,7 @@ class Board():
                                      [w + tile[0] * 100, h + tile[1] * 100,
                                       100, 100], 3)
 
-    def draw_pieces(self):
+    def draw_pieces(self) -> None:
         """ Draws the pieces onto the board
         """
         # Finds the starting corner for the board
@@ -569,7 +571,7 @@ class Board():
 
         return check
 
-    def in_check_block(self, turn: str) -> list:
+    def in_check_block(self, turn: str) -> List:
         """ Finds the tiles that can block a check.
 
         Args:
@@ -616,7 +618,7 @@ class Board():
 
         return block_tile
 
-    def actual_moves(self, color: str, piece) -> list:
+    def actual_moves(self, color: str, piece: Piece) -> List[List[Tuple]]:
         """ Finds the actual avalible moves for a piece.
 
         Args:
@@ -662,7 +664,8 @@ class Board():
 
         return moves
 
-    def check_can_move(self, color: str, piece, moves: list) -> list:
+    def check_can_move(self, color: str, piece: Piece,
+                       moves: List[List[Tuple]]) -> List[List[Tuple]]:
         """ Moves piece to see if the king will be in check after the move.
 
         Args:
