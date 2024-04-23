@@ -5,8 +5,11 @@ __date__ = ""
 __license__ = ""
 
 import pygame
+import os
 from board import Board
 from player import Player
+
+os.chdir("project")
 
 pygame.init()
 
@@ -36,7 +39,6 @@ def main() -> None:
     game.setup_pieces()
 
     # draws board
-    screen.fill("black")
     game.make_board(screen)
     game.draw_pieces(screen)
 
@@ -46,65 +48,40 @@ def main() -> None:
 
         # Takes care of keyboard/mouse input
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN and turn == "white":
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if turn == "white":
+                    player = player_1
+                else:
+                    player = player_2
                 # mouse click player 1
                 # gets coord of player click
-                click = player_1.click(WIDTH, HEIGHT)
+                click = player.click(WIDTH, HEIGHT)
 
-                if player_1.selected_peice_info is None:
+                if player.selected_peice_info is None:
                     # takes location and checks if a player peice is there
-                    player_1.selected_peice_info = game.select(turn, click)
+                    player.selected_peice_info = game.select(turn, click)
                 else:
                     # if player has selected peice then check avalible moves
-                    player_move = game.move(turn, player_1.selected_peice_info, click)
+                    player_move = game.move(turn, player.selected_peice_info, click)
 
                     # resets player selected
-                    player_1.selected_peice_info = None
+                    player.selected_peice_info = None
 
                     if player_move:
                         # if move is valid then switch turns
-                        turn = "black"
+                        turn = "white" if turn == "black" else "black"
+
                 # draws the board after player click
                 game.make_board(screen)
-                game.highlight_selected(player_1.selected_peice_info, screen, turn)
+                game.highlight_selected(player.selected_peice_info, screen, turn)
                 game.draw_pieces(screen)
 
-            elif event.type == pygame.MOUSEBUTTONDOWN and turn == "black":
-                # mouse click player 2
-                # gets coord of player click
-                click = player_2.click(WIDTH, HEIGHT)
-
-                if player_2.selected_peice_info is None:
-
-                    # takes location and checks if peice is there
-                    player_2.selected_peice_info = game.select(turn, click)
-
-                else:
-                    # if player has selected peice then check avalible moves
-                    player_move = game.move(turn, player_2.selected_peice_info, click)
-
-                    # resets player selected
-                    player_2.selected_peice_info = None
-
-                    if player_move:
-                        # if move is valid then switch turns
-                        turn = "white"
-                # draws the board after player click
-                game.make_board(screen)
-                game.highlight_selected(player_2.selected_peice_info, screen, turn)
-                game.draw_pieces(screen)
-            
+            # exit window
             if event.type == pygame.QUIT:
                 running = False
-        
-        
-        if turn == "black":
-            previous_turn = "white"
-        else:
-            previous_turn = "black"
-        if game.check_endgame_conditions(previous_turn):
-            game_over = game.draw_end_popup(screen)
-            if game_over:
+
+        if game.check_endgame_conditions("white" if turn == "black" else "black"):
+            if game.draw_end_popup(screen):
                 screen.fill('black')
                 game = Board(WIDTH, HEIGHT)
                 game.setup_pieces()
