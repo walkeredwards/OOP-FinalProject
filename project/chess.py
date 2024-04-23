@@ -36,9 +36,10 @@ def main() -> None:
     game.setup_pieces()
 
     # draws board
+    screen.fill("black")
     game.make_board(screen)
     game.draw_pieces(screen)
-    print(type(screen))
+
     # game loop
     while running:
         timer.tick(fps)
@@ -92,8 +93,25 @@ def main() -> None:
                 game.make_board(screen)
                 game.highlight_selected(player_2.selected_peice_info, screen, turn)
                 game.draw_pieces(screen)
-            # exit window
+            
             if event.type == pygame.QUIT:
+                running = False
+        
+        
+        if turn == "black":
+            previous_turn = "white"
+        else:
+            previous_turn = "black"
+        if game.check_endgame_conditions(previous_turn):
+            game_over = game.draw_end_popup(screen)
+            if game_over:
+                screen.fill('black')
+                game = Board(WIDTH, HEIGHT)
+                game.setup_pieces()
+                game.make_board(screen)
+                game.draw_pieces(screen)
+                turn = 'white'
+            else:
                 running = False
 
         pygame.display.flip()
