@@ -6,15 +6,19 @@ __license__ = "MIT"
 
 """ Contains the pieces objects for chess game"""
 
-import pygame
+
+from abc import abstractmethod
+from typing import Union
+import pygame  # type: ignore
 
 
 class Piece():
     """ Base class for pieces"""
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         self._color = color
         self._location = location
-        self._image = pygame.image.load('images/WhitePieces.png')
+        self._image: pygame.surface.Surface
 
     @property
     def color(self) -> str:
@@ -30,31 +34,27 @@ class Piece():
         """
         return self._location
 
-    @location.setter
-    def location(self, location: tuple[int, int]) -> None:
-        """setter for location
-
-        Args:
-            location (tuple[int, int]): new location
-        """
-        self._location = location
-
     @property
     def image(self) -> pygame.Surface:
         """getter for image"""
         return self._image
 
+    @abstractmethod
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
-        possible_moves: list[tuple[int, int]] = []
-        return possible_moves
+        raise NotImplementedError
+
+    @abstractmethod
+    def protect_moves(self, b_location: list[tuple[int, int]],
+                      w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
+        raise NotImplementedError
 
     def move(self, new_location: tuple[int, int], b_location: list[tuple[int, int]],
              w_location: list[tuple[int, int]]) -> bool:
-        """moves the piece to a new location
+        """ Moves the piece to a new location
 
         Args:
-            new_location (tuple[int, int]): cordinates of new locaton
+            new_location (tuple[int, int]): coordinates of new location
             b_location (list): list of black locations
             w_location (list): list of white locations
 
@@ -77,11 +77,12 @@ class Piece():
 
 # Types of pieces which all have different move sets.
 class Pawn(Piece):
-    """Pawn class"""
+    """ Pawn class"""
     # Can move 2 spaces forward on first move, but only 1 space after.
-    # Capture one space diaganal
-    # Promote when reach end
-    # En passant
+    # Capture one space diagonal
+    # Promotion option when pawn reaches end of board
+    # Enpassant
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
         self.enpassant = False
@@ -109,12 +110,12 @@ class Pawn(Piece):
                         self._location[1] == 6:
                     possible_moves.append(target)
 
-            # left diagonal capture
+            # left diag capture
             target = (self._location[0] + 1, self._location[1] - 1)
             if target in enemy_locations:
                 possible_moves.append(target)
 
-            # right diagonal capture
+            # right diag capture
             target = (self._location[0] - 1, self._location[1] - 1)
             if target in enemy_locations:
                 possible_moves.append(target)
@@ -143,9 +144,38 @@ class Pawn(Piece):
 
         return possible_moves
 
+    def protect_moves(self, b_location: list[tuple[int, int]],
+                      w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
+
+        protect_moves: list[tuple[int, int]] = []
+        if self._color == "white":
+            enemy_locations = b_location
+
+            # left diag capture
+            target = (self._location[0] + 1, self._location[1] - 1)
+            if target in enemy_locations:
+                protect_moves.append(target)
+
+            # right diag capture
+            target = (self._location[0] - 1, self._location[1] - 1)
+            if target in enemy_locations:
+                protect_moves.append(target)
+        else:
+            enemy_locations = w_location
+
+            target = (self._location[0] + 1, self._location[1] + 1)
+            if target in enemy_locations:
+                protect_moves.append(target)
+
+            target = (self._location[0] - 1, self._location[1] + 1)
+            if target in enemy_locations:
+                protect_moves.append(target)
+
+        return protect_moves
+
     def move(self, new_location: tuple[int, int], b_location: list[tuple[int, int]],
              w_location: list[tuple[int, int]]) -> bool:
-        """moves the piece to a new location
+        """ Moves the piece to a new location
 
         Args:
             new_location (tuple[int, int]): cordinates of new locaton
@@ -178,6 +208,7 @@ class Pawn(Piece):
 class Bishop(Piece):
     """Bishop class"""
     # Can move diagonally
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
         self._image = pygame.transform.scale(
@@ -260,7 +291,8 @@ class Bishop(Piece):
 class Knight(Piece):
     """ Knight class"""
     # Can move in an L shape (e.g. up/down 2, over 1)
-    # Can jump over pieces
+    # Is allowed to jump over pieces
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         super().__init__(color, location)
         self._image = pygame.transform.scale(
@@ -280,7 +312,8 @@ class Knight(Piece):
                 possible_moves.append(target)
         return possible_moves
 
-    def protect_moves(self) -> list[tuple[int, int]]:
+    def protect_moves(self, b_location: list[tuple[int, int]],
+                      w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
         protect_spaces = []
 
         targets = [(1, 2), (1, -2), (2, 1), (2, -1), (-1, 2), (-1, -2), (-2, 1), (-2, -1)]
@@ -292,10 +325,11 @@ class Knight(Piece):
 
 
 class Rook(Piece):
-    """Rook class"""
+    """ Rook class"""
     # Can move horizontally or vertically
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
-        """Initalization
+        """initalization
 
         Args:
             color (str): color of piece
@@ -308,7 +342,7 @@ class Rook(Piece):
 
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
-        """Finds all the possible moves
+        """ Finds all the possible moves
 
         Args:
             b_location (list): list of black piece locations
@@ -407,7 +441,7 @@ class Rook(Piece):
 
     def move(self, new_location: tuple[int, int], b_location: list[tuple[int, int]],
              w_location: list[tuple[int, int]]) -> bool:
-        """moves the piece
+        """ Moves the piece
 
         Args:
             new_location (tuple[int, int]): coords in the form of tuple indicating ne location
@@ -417,25 +451,17 @@ class Rook(Piece):
         Returns:
             bool: true or false weather the piece moved
         """
-        move = False
-
-        # finds possible moves
-        possible = self.possible_moves(b_location, w_location)
-
-        # if new location is possible
-        if new_location in possible:
-            # moves the piece
-            self._location = new_location
-            # sets move to true
+        move = super().move(new_location, b_location, w_location)
+        if move:
             self.moved = True
-            move = True
 
         return move
 
 
 class Queen(Piece):
-    """queen class"""
+    """ Queen class"""
     # Can move horizontally, vertically and/or diagonally
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         """initialization for queen
 
@@ -449,7 +475,7 @@ class Queen(Piece):
 
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:
-        """generates possible moves
+        """ Generates possible moves
 
         Args:
             b_location (list): list of black locations
@@ -551,10 +577,11 @@ class Queen(Piece):
         return protect_spaces
 
 
-class King(Piece):
-    """king class"""
+class King():
+    """ King class"""
     # Can only move to one of the 8 squares directly surrounding it
-    # castle only if: clear path to rook, the two haven't moved, does not go through check
+    # Castle only if: clear path to rook, the two haven't moved, does not go through check
+
     def __init__(self, color: str, location: tuple[int, int]) -> None:
         """initalization
 
@@ -562,21 +589,41 @@ class King(Piece):
             color (str): color of piece
             location (tuple[int, int]): starting location
         """
-        super().__init__(color, location)
+        self._color = color
+        self._location = location
         self.moved = False  # for castle
         self._image = pygame.transform.scale(
             pygame.image.load('images/' + color + '/king.png'), (90, 90))
 
+    @property
+    def color(self) -> str:
+        """getter for color"""
+        return self._color
+
+    @property
+    def location(self) -> tuple[int, int]:
+        """getter for location
+
+        Returns:
+            tuple[int, int]: location
+        """
+        return self._location
+
+    @property
+    def image(self) -> pygame.Surface:
+        """getter for image"""
+        return self._image
+
     def possible_moves(self, b_location: list[tuple[int, int]], w_location: list[tuple[int, int]],
-                       b_piece: list[Piece], w_piece: list[Piece],
+                       b_piece: list[Union[Piece, 'King']], w_piece: list[Union[Piece, 'King']],
                        turn: str) -> list[tuple[int, int]]:
-        """finds the possible moves for the king
+        """ Finds the possible moves for the king
 
         Args:
             b_location (list[tuple[int, int]]): list of locations of black pieces
             w_location (list[tuple[int, int]]): list of locations of white pieces
-            b_piece (list[Piece]): list of black pieces
-            w_piece (list[Piece]): list of white pieces
+            b_piece (list[Piece | King]): list of black pieces
+            w_piece (list[Piece | King]): list of white pieces
             turn (str): color that can move
 
         Returns:
@@ -614,7 +661,7 @@ class King(Piece):
         if not self.moved:
             # prevents castle checking for other king
             check_caslte = not turn != self.color
-            castle = self.castle_avalivle(b_location, w_location, b_piece, w_piece, check_caslte)
+            castle = self.castle_available(b_location, w_location, b_piece, w_piece, check_caslte)
 
         if castle is not None and castle[0]:
             # king side
@@ -645,16 +692,16 @@ class King(Piece):
 
         return protect_spaces
 
-    def castle_avalivle(self, b_location: list[tuple[int, int]], w_location: list[tuple[int, int]],
-                        b_piece: list[Piece], w_piece: list[Piece],
-                        check_castle: bool) -> tuple[bool, bool]:
-        """checks if the king can castle
+    def castle_available(self, b_location: list[tuple[int, int]], w_location: list[tuple[int, int]],
+                         b_piece: list[Union[Piece, 'King']], w_piece: list[Union[Piece, 'King']],
+                         check_castle: bool) -> tuple[bool, bool]:
+        """ Checks if the king can castle
 
         Args:
             b_location (list[tuple[int, int]]): list of locations of black pieces
             w_location (list[tuple[int, int]]): list of locations of white pieces
-            b_piece (list[Piece]): list of black pieces
-            w_piece (list[Piece]): list of white pieces
+            b_piece (list[Piece | King]): list of black pieces
+            w_piece (list[Piece | King]): list of white pieces
             check_castle (bool): true or false weather to check castle
 
         Returns:
@@ -666,8 +713,8 @@ class King(Piece):
         king_rook = None
 
         # assumes path is safe
-        k_avalible = True  # king side
-        q_avalible = True  # queen side
+        k_available = True  # king side
+        q_available = True  # queen side
 
         if check_castle:
             # if check_castle is true then it will check, prevents loop
@@ -689,23 +736,24 @@ class King(Piece):
                     if isinstance(piece, Rook) and piece.location == (0, 0):
                         queen_rook = piece
 
-            q_avalible = self.queen_castle(queen_rook, b_location, w_location, b_piece, w_piece)
+            q_available = self.queen_castle(queen_rook, b_location, w_location, b_piece, w_piece)
 
-            k_avalible = self.king_castle(king_rook, b_location, w_location, b_piece, w_piece)
+            k_available = self.king_castle(king_rook, b_location, w_location, b_piece, w_piece)
 
-        return (k_avalible, q_avalible)
+        return (k_available, q_available)
 
-    def king_castle(self, rook: Rook, b_location: list[tuple[int, int]],
+    def king_castle(self, rook: Rook | None, b_location: list[tuple[int, int]],
                     w_location: list[tuple[int, int]],
-                    b_piece: list[Piece], w_piece: list[Piece]) -> bool:
-        """checks it the king side castle is avalible
+                    b_piece: list[Union[Piece, 'King']],
+                    w_piece: list[Union[Piece, 'King']]) -> bool:
+        """ Checks it the king side castle is available
 
         Args:
             rook (Rook): rook to check
             b_location (list[tuple[int, int]]): location of black pieces
             w_location (list[tuple[int, int]]): location of white pieces
-            b_piece (list[Piece]): list of black pieces
-            w_piece (list[Piece]): list of white pieces
+            b_piece (list[Piece | King]): list of black pieces
+            w_piece (list[Piece | King]): list of white pieces
 
         Returns:
             bool: if king can castle king side
@@ -743,7 +791,7 @@ class King(Piece):
                 # finds piece's possible moves
                 if isinstance(piece, King):
                     attacking = piece.possible_moves(b_location, w_location,
-                                                     b_piece, w_piece, False)
+                                                     b_piece, w_piece, self.color)
                 else:
                     attacking = piece.possible_moves(b_location, w_location)
 
@@ -757,17 +805,18 @@ class King(Piece):
 
         return True
 
-    def queen_castle(self, rook: Rook, b_location: list[tuple[int, int]],
+    def queen_castle(self, rook: Rook | None, b_location: list[tuple[int, int]],
                      w_location: list[tuple[int, int]],
-                     b_piece: list[Piece], w_piece: list[Piece]) -> bool:
-        """checks it the queen side castle is avalible
+                     b_piece: list[Union[Piece, 'King']],
+                     w_piece: list[Union[Piece, 'King']]) -> bool:
+        """ Checks it the queen side castle is available
 
         Args:
             rook (Rook): rook to check
             b_location (list[tuple[int, int]]): location of black pieces
             w_location (list[tuple[int, int]]): location of white pieces
-            b_piece (list[Piece]): list of black pieces
-            w_piece (list[Piece]): list of white pieces
+            b_piece (list[Piece | King]): list of black pieces
+            w_piece (list[Piece | King]): list of white pieces
 
         Returns:
             bool: if king can castle queen side
@@ -826,15 +875,15 @@ class King(Piece):
 
     def move(self, new_location: tuple[int, int], b_location: list[tuple[int, int]],
              w_location: list[tuple[int, int]],
-             b_piece: list[Piece], w_piece: list[Piece]) -> bool:
+             b_piece: list[Union[Piece, 'King']], w_piece: list[Union[Piece, 'King']]) -> bool:
         """moves the piece to the new location
 
         Args:
             new_location (tuple[int, int]): new location that you want to move to
             b_location (list[tuple[int, int]]): list of locations of black pieces
             w_location (list[tuple[int, int]]): list of locations of white pieces
-            b_piece (list[Piece]): list of black pieces
-            w_piece (list[Piece]): list of white pieces
+            b_piece (list[Piece | King]): list of black pieces
+            w_piece (list[Piece | King]): list of white pieces
 
         Returns:
             bool: true or false wether the move actually went through
@@ -872,13 +921,13 @@ class King(Piece):
 
         return move
 
-    def castle_move(self, friend: list[Piece], new_location: tuple[int, int],
+    def castle_move(self, friend: list[Union[Piece, 'King']], new_location: tuple[int, int],
                     b_location: list[tuple[int, int]],
                     w_location: list[tuple[int, int]], side: str) -> None:
         """moves king and rook in castle
 
         Args:
-            friend (list[Piece]): list of friends
+            friend (list[Piece | King]): list of friends
             new_location (tuple[int, int]): new location
             b_location (list[tuple[int, int]]): black locations
             w_location (list[tuple[int, int]]): white locations
@@ -915,7 +964,7 @@ class King(Piece):
                 break
 
     def is_safe(self, b_location: list[tuple[int, int]], w_location: list[tuple[int, int]],
-                b_pieces: list[Piece], w_pieces: list[Piece],
+                b_pieces: list[Union[Piece, 'King']], w_pieces: list[Union[Piece, 'King']],
                 coord: tuple[int, int]) -> bool:
         """checks coordanate for safty
         also removes king piece from locations so king can't move into check
@@ -923,8 +972,8 @@ class King(Piece):
         Args:
             b_location (list[tuple[int, int]]): location of black pieces
             w_location (list[tuple[int, int]]): location of white pieces
-            b_pieces (list[Piece]): list of black pieces
-            w_pieces (list[Piece]): list of white pieces
+            b_pieces (list[Piece | King]): list of black pieces
+            w_pieces (list[Piece | King]): list of white pieces
             coord (tuple[int, int]): cordinate to be checked on the board
 
         Returns:
@@ -944,11 +993,11 @@ class King(Piece):
 
         # checks all pieces and their attacking spaces
         for piece in enemy:
-            avalible = []
+            available = []
 
-            if isinstance(piece, King) or isinstance(piece, Knight):
+            if isinstance(piece, King):
                 # diffrent possible moves eith no args
-                avalible = piece.protect_moves()
+                available = piece.protect_moves()
             elif isinstance(piece, Pawn):
                 # check attacking tiles, diffrent than possible moves
                 if self.color == "white" and \
@@ -964,13 +1013,13 @@ class King(Piece):
                 # check all other pieces
                 if self.color == "white":
                     # no king list for white
-                    avalible = piece.protect_moves(b_location, no_king_list)
+                    available = piece.protect_moves(b_location, no_king_list)
                 else:
                     # no king list for black
-                    avalible = piece.protect_moves(no_king_list, w_location)
+                    available = piece.protect_moves(no_king_list, w_location)
 
-            if coord in avalible:
-                # if cord is in avalible not safe
+            if coord in available:
+                # if cord is in available not safe
                 return False
 
         return True

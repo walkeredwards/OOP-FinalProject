@@ -6,17 +6,18 @@ __license__ = "MIT"
 
 """ Player class"""
 
-import pygame
-# from collections.abc import Callable
+import pygame  # type: ignore
 from pieces import Piece
+from pieces import King
 
 
 class Player():
     """ Player class"""
+
     def __init__(self, color: str) -> None:
         """ Initialization"""
         self._color = color  # Color black or white
-        self._selected_piece_info = None  # Selected piece
+        self._selected_piece_info: Piece | None | King = None  # Selected piece
 
     @property
     def color(self) -> str:
@@ -24,13 +25,13 @@ class Player():
         return self._color
 
     @property
-    def selected_piece_info(self) -> Piece:
+    def selected_piece_info(self) -> Piece | King | None:
         """ getter for _selected_piece"""
         return self._selected_piece_info
 
     @selected_piece_info.setter
-    def selected_piece_info(self, piece: Piece) -> None:
-        """ setter for _selected_piece_info"""
+    def selected_piece_info(self, piece: Piece | King) -> None:
+        """setter for _selected_piece_info"""
         self._selected_piece_info = piece
 
     def click(self, width: int, height: int) -> tuple[int, int]:
