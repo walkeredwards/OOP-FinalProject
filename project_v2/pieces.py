@@ -9,7 +9,7 @@ __license__ = "MIT"
 
 from abc import abstractmethod
 from typing import Union
-import pygame  # type: ignore
+import pygame
 
 
 class Piece():
