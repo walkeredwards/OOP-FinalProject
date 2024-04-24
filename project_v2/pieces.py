@@ -87,7 +87,7 @@ class Pawn(Piece):
         super().__init__(color, location)
         self.enpassant = False
         self._image = pygame.transform.scale(
-            pygame.image.load('images/' + color + '/pawn.png'), (90, 120))
+            pygame.image.load('images/' + color + '/pawn.png'), (90, 90))
 
     def possible_moves(self, b_location: list[tuple[int, int]],
                        w_location: list[tuple[int, int]]) -> list[tuple[int, int]]:

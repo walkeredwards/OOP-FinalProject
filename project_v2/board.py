@@ -72,7 +72,7 @@ class Board():
 
     # Set up the chess pieces on the board
     def setup_pieces(self) -> None:
-        """creates peces and stores them in the corrisponding list"""
+        """ Creates pieces and stores them in the corresponding list"""
 
         # Initialize black pieces for player 2 and put them in the pieces list
         # Row 1
@@ -148,14 +148,18 @@ class Board():
                     pygame.draw.rect(self._screen, 'black', [w + col * 100,
                                      h + row * 100, 100, 100])
 
-        # highlights the most recent piece moved and it's old location
+        # Highlights the most recent piece moved and it's old location
         if self._last_piece_moved is not None and self._old_location is not None:
-            pygame.draw.rect(self._screen, (176, 255, 248), [w + self._old_location[0] * 100,
+            if (self._last_piece_moved._color == "black"):
+                square_color = 'green'
+            else:
+                square_color = 'hot pink'
+            pygame.draw.rect(self._screen, square_color, [w + self._old_location[0] * 100,
                              h + self._old_location[1] * 100, 100, 100])
-            pygame.draw.rect(self._screen, (176, 255, 248),
+            pygame.draw.rect(self._screen, square_color,
                              [w + self._last_piece_moved.location[0] * 100,
-                             h + self._last_piece_moved.location[1] * 100,
-                             100, 100])
+                              h + self._last_piece_moved.location[1] * 100,
+                              100, 100])
 
         # highlights king in check with red
         if self._in_check is not None:
@@ -201,10 +205,19 @@ class Board():
             # adds current piece tile for highlight
             moves.append(selected_piece.location)
 
+            if (turn == "black"):
+                square_color = 'green'
+            else:
+                square_color = 'hot pink'
+
+            pygame.draw.rect(self._screen, square_color,
+                             [w + selected_piece.location[0] * 100,
+                              h + selected_piece.location[1] * 100, 100, 100])
+
             # draws the avalible moves
             for tile in moves:
-                pygame.draw.rect(self._screen, (161, 255, 186),
-                                 [w + tile[0] * 100, h + tile[1] * 100, 100, 100])
+                pygame.draw.rect(self._screen, square_color,
+                                 [w + tile[0] * 100, h + tile[1] * 100, 100, 100], 3)
 
     def draw_pieces(self) -> None:
         """draws the pieces
