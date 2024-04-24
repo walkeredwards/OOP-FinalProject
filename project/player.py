@@ -1,9 +1,12 @@
 """player class"""
 
+__authors__ = "Bryleigh Koci, Walker Edwards, Elena Schmitt"
+__date__ = "26 April 2024"
+__license__ = "MIT"
+
 import pygame
-# from collections.abc import Callable
-from peices import Piece
-from peices import King
+from pieces import Piece
+from pieces import King
 
 
 class Player():
@@ -11,7 +14,7 @@ class Player():
     def __init__(self, color: str) -> None:
         """initialization"""
         self._color: str = color  # color black or white
-        self._selected_peice_info: Piece | None | King = None  # selected peice
+        self._selected_piece_info: Piece | None | King = None  # selected piece
 
     @property
     def color(self) -> str:
@@ -19,14 +22,14 @@ class Player():
         return self._color
 
     @property
-    def selected_peice_info(self) -> Piece | King | None:
-        """getter for _selected_peice"""
-        return self._selected_peice_info
+    def selected_piece_info(self) -> Piece | King | None:
+        """getter for _selected_piece"""
+        return self._selected_piece_info
 
-    @selected_peice_info.setter
-    def selected_peice_info(self, peice: Piece | King) -> None:
-        """setter for _selected_peice_info"""
-        self._selected_peice_info = peice
+    @selected_piece_info.setter
+    def selected_piece_info(self, piece: Piece | King) -> None:
+        """setter for _selected_piece_info"""
+        self._selected_piece_info = piece
 
     def click(self, width: int, height: int) -> tuple[int, int]:
         """gets coordanates for click
