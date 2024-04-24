@@ -6,7 +6,7 @@ __license__ = "MIT"
 
 """ Player class"""
 
-import pygame  # type: ignore
+import pygame
 from pieces import Piece
 from pieces import King
 
