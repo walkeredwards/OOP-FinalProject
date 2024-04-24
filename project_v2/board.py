@@ -178,10 +178,10 @@ class Board():
             w = (self._width - 800) // 2
             h = (self._heght - 800) // 2
 
-            # if enpassant is avalible add the hidden pawn to piece list to check
+            # if enpassant is available add the hidden pawn to piece list to check
             if self._enpassant_pawn is not None and isinstance(selected_piece, Pawn):
                 if turn == "white":
-                    # appends enpassont pawn and location
+                    # appends enpassant pawn and location
                     self._black_pieces.append(self._enpassant_pawn)
                     self._black_location.append(self._enpassant_pawn.location)
                     # finds moves
@@ -214,7 +214,7 @@ class Board():
                              [w + selected_piece.location[0] * 100,
                               h + selected_piece.location[1] * 100, 100, 100])
 
-            # draws the avalible moves
+            # draws the available moves
             for tile in moves:
                 pygame.draw.rect(self._screen, square_color,
                                  [w + tile[0] * 100, h + tile[1] * 100, 100, 100], 3)
@@ -327,7 +327,7 @@ class Board():
         # find actual moves for piece
         actual_moves = self.actual_moves(color, selected_piece)
 
-        # checks if avalible and moves if new_location is in actual_moves
+        # checks if available and moves if new_location is in actual_moves
         if new_location in actual_moves:
             if isinstance(selected_piece, King):
                 last_location = selected_piece.location
@@ -484,7 +484,7 @@ class Board():
         return block_tile
 
     def actual_moves(self, color: str, piece: Piece | King) -> list[tuple[int, int]]:
-        """finds the actual avalible moves for a piece
+        """finds the actual available moves for a piece
 
         Args:
             color (str): color of piece
@@ -521,7 +521,7 @@ class Board():
                 block_moves = self.in_check_block(color)  # finds blockable tiles
                 for coord in selected_moves:
                     if coord in block_moves:
-                        # if the possible move is in blockable moves append to avalible
+                        # if the possible move is in blockable moves append to available
                         moves.append(coord)
 
             # check if move dosn't put king in check
