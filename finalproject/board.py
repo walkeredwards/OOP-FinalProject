@@ -28,7 +28,7 @@ Chess Board Initial Layout
   WR     WK     WB     WQ     WK     WB     WK     WR
 """
 
-import pygame
+import pygame  # type: ignore
 from pieces import Piece
 from pieces import Rook
 from pieces import Knight

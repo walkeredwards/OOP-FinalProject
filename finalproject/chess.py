@@ -17,12 +17,16 @@ HEIGHT = 900
 
 
 class Main():
+    def __init__(self) -> None:
+        # None
+        self._caption = "Chess"
+
     # flake8: noqa: C901
-    def main() -> None:
+    def main(self) -> None:
         """ Main game setup and loop"""
         # Creates pygame screen
         screen = pygame.display.set_mode([WIDTH, HEIGHT])
-        pygame.display.set_caption("Chess")
+        pygame.display.set_caption(self._caption)
 
         # Sets fps
         timer = pygame.time.Clock()
@@ -130,4 +134,4 @@ class Main():
 
 # Call to main function to start game loop
 if __name__ == "__main__":
-    Main.main()
+    Main().main()
