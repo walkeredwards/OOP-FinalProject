@@ -5,7 +5,7 @@ __date__ = "26 April 2024"
 __license__ = "MIT"
 
 
-import pygame  # type: ignore
+import pygame
 from board import Board
 from player import Player
 
