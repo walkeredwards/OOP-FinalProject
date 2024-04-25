@@ -93,11 +93,10 @@ def main() -> None:
                 game.make_board(screen)
                 game.highlight_selected(player_2.selected_peice_info, screen, turn)
                 game.draw_pieces(screen)
-            
+
             if event.type == pygame.QUIT:
                 running = False
-        
-        
+
         if turn == "black":
             previous_turn = "white"
         else:

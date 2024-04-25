@@ -7,6 +7,7 @@ from peices import Piece
 
 class Player():
     """player class"""
+
     def __init__(self, color: str) -> None:
         """initialization"""
         self._color = color  # color black or white

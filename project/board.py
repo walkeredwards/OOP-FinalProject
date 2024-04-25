@@ -32,6 +32,7 @@ from peices import Pawn
 
 class Board():
     """board class"""
+
     def __init__(self, width, height) -> None:
         """board initalizer.
 
@@ -345,7 +346,7 @@ class Board():
             # update peice locations
             self.update_locations()
             # check if any endgame conditions are met
-            #self.check_endgame_conditions(color)
+            # self.check_endgame_conditions(color)
 
         return move
 
@@ -715,9 +716,9 @@ class Board():
         font = pygame.font.Font('font/ka1.ttf', 36)
 
         gameover = font_header.render("GAME OVER", True, 'red')
-        gameover_rect = gameover.get_rect(center = (self._width // 2, self._heght // 5))
+        gameover_rect = gameover.get_rect(center=(self._width // 2, self._heght // 5))
         message = font_title.render("Do you want to play again?", True, 'black')
-        message_rect = message.get_rect(center = (self._width // 2, self._heght // 3))
+        message_rect = message.get_rect(center=(self._width // 2, self._heght // 3))
         screen.blit(gameover, gameover_rect)
         screen.blit(message, message_rect)
 
@@ -732,11 +733,25 @@ class Board():
         pygame.draw.rect(screen, 'red', [quit_button_x, button_y, button_w, button_h])
 
         play_text = font.render("Play Again", True, 'black')
-        play_text_rect = play_text.get_rect(center=(play_button_x + button_w // 2, button_y + button_h // 2))
+        play_text_rect = play_text.get_rect(
+            center=(
+                play_button_x +
+                button_w //
+                2,
+                button_y +
+                button_h //
+                2))
         screen.blit(play_text, play_text_rect)
 
         quit_text = font.render("Quit", True, 'black')
-        quit_text_rect = quit_text.get_rect(center=(quit_button_x + button_w // 2, button_y + button_h // 2))
+        quit_text_rect = quit_text.get_rect(
+            center=(
+                quit_button_x +
+                button_w //
+                2,
+                button_y +
+                button_h //
+                2))
         screen.blit(quit_text, quit_text_rect)
 
         pygame.display.flip()
@@ -746,9 +761,8 @@ class Board():
                 if event.type == pygame.QUIT:
                     return False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if(quit_text_rect.collidepoint(event.pos)):
+                    if (quit_text_rect.collidepoint(event.pos)):
                         return False
-                    elif(play_text_rect.collidepoint(event.pos)):
+                    elif (play_text_rect.collidepoint(event.pos)):
                         # Add code to reset board and restart the game.
                         return True
-
