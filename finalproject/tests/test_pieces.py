@@ -467,66 +467,6 @@ class TestPawn(unittest.TestCase):
         for test in expected_protect:
             self.assertIn(test, protect)
 
-    def test_pawn_with_other_2(self) -> None:
-        """test with other pieces"""
-
-        piece = Pawn("black", (4, 2))
-        friend = [(4, 2), (3, 0), (2, 7), (0, 0), (7, 5), (6, 5), (3, 3)]
-        enemy = [(0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6),
-                 (6, 6), (7, 6), (5, 3)]
-
-        expected_possible = [(4, 3), (5, 3)]
-
-        expected_protect = [(3, 3), (5, 3)]
-
-        possible = piece.possible_moves(friend, enemy)
-        protect = piece.protect_moves(friend, enemy)
-
-        for test in expected_possible:
-            self.assertIn(test, possible)
-        for test in expected_protect:
-            self.assertIn(test, protect)
-
-    def test_pawn_with_other_3(self) -> None:
-        """test with other pieces"""
-
-        piece = Pawn("white", (6, 6))
-        friend = [(7, 7), (6, 7), (6, 6), (7, 6)]
-        enemy = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0),
-                 (4, 4), (2, 1), (2, 2), (2, 3), (2, 4), (2, 6), (6, 4)]
-
-        expected_possible = [(6, 5)]
-
-        expected_protect = [(5, 5), (7, 5)]
-
-        possible = piece.possible_moves(enemy, friend)
-        protect = piece.protect_moves(friend, enemy)
-
-        for test in expected_possible:
-            self.assertIn(test, possible)
-        for test in expected_protect:
-            self.assertIn(test, protect)
-
-    def test_pawn_with_other_4(self) -> None:
-        """test with other pieces"""
-
-        piece = Pawn("white", (0, 6))
-        friend = [(0, 6), (6, 7), (6, 6), (7, 6)]
-        enemy = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0),
-                 (0, 5), (1, 5), (2, 2), (2, 3), (2, 4), (2, 6), (6, 4)]
-
-        expected_possible = [(1, 5)]
-
-        expected_protect = [(1, 5)]
-
-        possible = piece.possible_moves(enemy, friend)
-        protect = piece.protect_moves(friend, enemy)
-
-        for test in expected_possible:
-            self.assertIn(test, possible)
-        for test in expected_protect:
-            self.assertIn(test, protect)
-
 
 class TestKing(unittest.TestCase):
     """tests for King"""

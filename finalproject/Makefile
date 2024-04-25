@@ -18,8 +18,8 @@ endif
 	@echo "All unittests passed!"
 
 .PHONY: check-pygame
-check-pygame-installation:
-ifeq ($(shell which pygame), )
+check-pygame:
+ifeq ($(shell python3 -c "import pygame" 2>/dev/null; echo $$?), 1)
 	@echo "pygame not found. Installing pygame..."
 	pip install pygame
 endif
