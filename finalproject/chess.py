@@ -42,6 +42,7 @@ class Main():
 
         # Sets up game loop
         running: bool = True
+        forfeit: bool = False
         turn: str = "white"
 
         # Creates instance of board for the game
@@ -66,9 +67,10 @@ class Main():
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == K_f and turn == "white":
-                        running = game.forfeit(turn)
+                        forfeit = game.forfeit(turn)
                     if event.key == K_f and turn == "black":
-                        running = game.forfeit(turn)
+                        forfeit = game.forfeit(turn)
+        
                 if event.type == pygame.MOUSEBUTTONDOWN and turn == "white":
                     # Handles mouse click for player 1 and gets coordinates of click
                     click = player_1.click(WIDTH, HEIGHT)
@@ -121,12 +123,13 @@ class Main():
                 previous_turn = "white"
             else:
                 previous_turn = "black"
-            if game.check_endgame_conditions(previous_turn):
+            if game.check_endgame_conditions(previous_turn) or forfeit:
                 print("Checkmate or stalemate detected. Calling end game popup...")
                 game_over = game.end_game(previous_turn)
                 print(f"Popup returned: {game_over}")
                 if game_over:
                     screen.fill('black')
+                    forfeit = False
                     game = Board(WIDTH, HEIGHT, screen)
                     game.setup_pieces()
                     game.make_board()
