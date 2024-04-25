@@ -408,7 +408,7 @@ class Board():
         font_title = pygame.font.Font('font/ka1.ttf', 60)
         font = pygame.font.Font('font/ka1.ttf', 36)
 
-        gameover = font_header.render("GAME OVER", True, 'red')
+        gameover = font_header.render("FORFEIT?", True, 'red')
         gameover_rect = gameover.get_rect(center=(self._width // 2, self._height // 5))
         message = font_title.render("Are you sure you want to forfeit?", True, 'white')
         message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
@@ -895,6 +895,7 @@ class Board():
 
         self._screen.fill('black')
 
+        font_winner = pygame.font.Font('font/ka1.ttf', 120)
         font_header = pygame.font.Font('font/ka1.ttf', 100)
         font_title = pygame.font.Font('font/ka1.ttf', 70)
         font = pygame.font.Font('font/ka1.ttf', 36)
@@ -907,10 +908,10 @@ class Board():
             win_message = "WHITE WINS"
 
         gameover = font_header.render("GAME OVER", True, 'red')
-        gameover_rect = gameover.get_rect(center=(self._width // 2, self._height // 5))
+        gameover_rect = gameover.get_rect(center=(self._width // 2, self._height // 3.5))
 
-        winner_message = font_title.render(win_message, True, font_color)
-        winner_rect = winner_message.get_rect(center=(self._width // 2, self._height // 3))
+        winner_message = font_winner.render(win_message, True, font_color)
+        winner_rect = winner_message.get_rect(center=(self._width // 2, self._height // 7))
 
         message = font_title.render("Do you want to play again?", True, 'white')
         message_rect = message.get_rect(center=(self._width // 2, self._height // 2.3))
