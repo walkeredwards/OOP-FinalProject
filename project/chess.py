@@ -5,8 +5,11 @@ __date__ = "26 April 2024"
 __license__ = "MIT"
 
 import pygame
+import os
 from board import Board
 from player import Player
+
+os.chdir("project")
 
 pygame.init()
 
@@ -32,7 +35,7 @@ def main() -> None:
     running: bool = True
     turn: str = "white"
 
-    game = Board(WIDTH, HEIGHT)
+    game = Board(WIDTH, HEIGHT, screen)
     game.setup_pieces()
 
     # draws board
@@ -64,7 +67,7 @@ def main() -> None:
                     player.selected_piece_info = game.select(turn, click)
                 else:
                     # if player has selected piece then check avalible moves
-                    player_move = game.move(turn, player.selected_piece_info, click)
+                    player_move = game.move_check(turn, player.selected_piece_info, click)
 
                     # resets player selected
                     player.selected_piece_info = None
@@ -78,7 +81,7 @@ def main() -> None:
 
         if game.check_endgame_conditions("white" if turn == "black" else "black"):
             if game.draw_end_popup(screen, "white" if turn == "black" else "black"):
-                game = Board(WIDTH, HEIGHT)
+                game = Board(WIDTH, HEIGHT, screen)
                 game.setup_pieces()
                 game.make_board(screen, turn)
                 game.draw_pieces(screen)

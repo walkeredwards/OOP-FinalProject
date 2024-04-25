@@ -37,7 +37,7 @@ from pieces import Pawn
 
 class Board():
     """board class"""
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, screen: pygame.surface.Surface) -> None:
         """board initalizer.
 
         Args:
@@ -45,7 +45,7 @@ class Board():
             height (int): height of screen
         """
         self._width: int = width  # width of pygamescreen
-        self._heght: int = height  # height of pygame screen
+        self._height: int = height  # height of pygame screen
         self._white_pieces: list[Piece | King] = []  # list of all white pieces
         self._black_pieces: list[Piece | King] = []  # list of all black pieces
         self._white_location: list[tuple[int, int]] = []  # list of white piece locations
@@ -62,6 +62,9 @@ class Board():
         # if the most recent move was a pawn 'foward' 2, allowing for enpassant
         # invisable pawn that will allow enpassant
         self._enpassant_pawn: Piece | King | None = None
+
+        # pygame screen
+        self._screen = screen
 
     # Set up the chess pieces on the board
     def setup_pieces(self) -> None:
@@ -131,7 +134,7 @@ class Board():
 
         # finds the starting corner for the board
         w = (self._width - 800) // 2
-        h = (self._heght - 800) // 2
+        h = (self._height - 800) // 2
 
         # blackout previous
         screen.fill('black')
@@ -189,7 +192,7 @@ class Board():
         if selected_piece is not None:
             # finds corners of board
             w = (self._width - 800) // 2
-            h = (self._heght - 800) // 2
+            h = (self._height - 800) // 2
 
             # if enpassant is avalible add the hidden pawn to piece list to check
             if self._enpassant_pawn is not None and isinstance(selected_piece, Pawn):
@@ -244,7 +247,7 @@ class Board():
         """
         # finds the starting corner for the board
         w = (self._width - 800) // 2
-        h = (self._heght - 800) // 2
+        h = (self._height - 800) // 2
 
         # draws white pieces
         for piece in self._white_pieces:
@@ -319,8 +322,8 @@ class Board():
                     return piece
         return None
 
-    def move(self, color: str, selected_piece: Piece | King,
-             new_location: tuple[int, int]) -> bool:
+    def move_check(self, color: str, selected_piece: Piece | King,
+                   new_location: tuple[int, int]) -> bool:
         """moves a piece
 
         Args:
@@ -368,29 +371,41 @@ class Board():
 
         # if the piece actually moved update info
         if move:
-            if self._enpassant_pawn is not None and self._last_piece_moved is not None and \
-                  new_location == self._enpassant_pawn.location:
-                # captures the enpassant pawn
-                self.check_capture(color, self._last_piece_moved.location)
-
-            self._old_location = last_location
-            self._last_piece_moved = selected_piece
-
-            # if a pawn moved 2 tile set up for enpassant
-            if isinstance(selected_piece, Pawn) and \
-                    (new_location[1] == self._old_location[1] + 2 or
-                     new_location[1] == self._old_location[1] - 2):
-                self.enpassant(selected_piece, True)
-            else:
-                # reset enpassant to false
-                self.enpassant(selected_piece, False)
-
-            # captures any pieces
-            self.check_capture(color, new_location)
-            # update piece locations
-            self.update_locations()
+            self.move_moved(color, selected_piece, new_location, last_location)
 
         return move
+
+    def move_moved(self, color: str, selected_piece: Piece | King,
+                   new_location: tuple[int, int],
+                   last_location: tuple[int, int]) -> None:
+        """updating for if a piece moved"""
+        if self._enpassant_pawn is not None and self._last_piece_moved is not None and \
+                new_location == self._enpassant_pawn.location:
+            # captures the enpassant pawn
+            self.check_capture(color, self._last_piece_moved.location)
+
+        self._old_location = last_location
+        self._last_piece_moved = selected_piece
+
+        if isinstance(selected_piece, Pawn):
+            if (selected_piece.color == 'black' and selected_piece.location[1] == 7):
+                self.promotion(selected_piece)
+            elif (selected_piece.color == 'white' and selected_piece.location[1] == 0):
+                self.promotion(selected_piece)
+
+        # if a pawn moved 2 tile set up for enpassant
+        if isinstance(selected_piece, Pawn) and \
+                (new_location[1] == self._old_location[1] + 2 or
+                 new_location[1] == self._old_location[1] - 2):
+            self.enpassant(selected_piece, True)
+        else:
+            # reset enpassant to false
+            self.enpassant(selected_piece, False)
+
+        # captures any pieces
+        self.check_capture(color, new_location)
+        # update piece locations
+        self.update_locations()
 
     def enpassant(self, piece: Piece | King, able: bool) -> None:
         """sets flags to indicate if a pawn can capture via enpassant
@@ -765,16 +780,16 @@ class Board():
             txt = "STALEMATE"
         endcondition = font_header.render(txt, True, 'red')
 
-        endcondition_rect = endcondition.get_rect(center=(self._width // 2, self._heght // 5))
+        endcondition_rect = endcondition.get_rect(center=(self._width // 2, self._height // 5))
 
         message = font_title.render("Do you want to play again?", True, 'black')
-        message_rect = message.get_rect(center=(self._width // 2, self._heght // 3))
+        message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
         screen.blit(endcondition, endcondition_rect)
         screen.blit(message, message_rect)
 
         button_w = 150
         button_h = 50
-        button_y = self._heght // 2 + 55
+        button_y = self._height // 2 + 55
 
         play_button_x = (self._width - button_w - 250) // 2
         quit_button_x = (self._width + 100) // 2
@@ -799,8 +814,95 @@ class Board():
                 if event.type == pygame.QUIT:
                     return False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if (quit_text_rect.collidepoint(event.pos)):
+                    if quit_text_rect.collidepoint(event.pos):
                         return False
-                    elif (play_text_rect.collidepoint(event.pos)):
+                    elif play_text_rect.collidepoint(event.pos):
                         # Add code to reset board and restart the game.
                         return True
+
+    def promotion(self, piece: Pawn) -> None:
+        """
+        If pawn reaches end of board, player can promote to piece of choosing.
+
+        Args: piece: current pawn player is promoting
+
+        Return: None:
+        """
+        self._screen.fill((0, 0, 0))
+        font_title = pygame.font.Font('font/ka1.ttf', 70)
+
+        font_color = 'hot pink' if piece.color == 'white' else 'green'
+
+        message = font_title.render("Choose a piece to promote", True, font_color)
+        message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
+        self._screen.blit(message, message_rect)
+
+        # Draw background rects for pieces
+        x_pos = 450
+        for i in range(4):
+            pygame.draw.rect(self._screen, font_color, [x_pos, 400, 100, 100])
+            x_pos += 200
+
+        # Draw queen option
+        queen_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+                                             '/queen.png'), (90, 90))
+        queen_rect = queen_image.get_rect(topleft=(450, 400))
+        self._screen.blit(queen_image, queen_rect)
+        # Draw bishop option
+        bishop_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+                                              '/bishop.png'), (90, 90))
+        bishop_rect = bishop_image.get_rect(topleft=(650, 400))
+        self._screen.blit(bishop_image, bishop_rect)
+        # Draw rook option
+        rook_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+                                            '/rook.png'), (90, 90))
+        rook_rect = rook_image.get_rect(topleft=(850, 400))
+        self._screen.blit(rook_image, rook_rect)
+        # Draw knight option
+        knight_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+                                              '/knight.png'), (90, 90))
+        knight_rect = knight_image.get_rect(topleft=(1050, 400))
+        self._screen.blit(knight_image, knight_rect)
+
+        pygame.display.flip()
+
+        promoted = False
+        while not promoted:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    coords = piece.location
+                    color = piece.color
+                    new_peice: Piece
+
+                    if queen_rect.collidepoint(event.pos):
+                        new_peice = Queen(color, coords)
+                        self.promote_peice(new_peice, piece)
+                        promoted = True
+                    elif bishop_rect.collidepoint(event.pos):
+                        new_peice = Bishop(color, coords)
+                        self.promote_peice(new_peice, piece)
+                        promoted = True
+                    elif rook_rect.collidepoint(event.pos):
+                        new_peice = Rook(color, coords)
+                        self.promote_peice(new_peice, piece)
+                        promoted = True
+                    elif knight_rect.collidepoint(event.pos):
+                        new_peice = Knight(color, coords)
+                        self.promote_peice(new_peice, piece)
+                        promoted = True
+
+    def promote_peice(self, promote: Piece, piece: Pawn) -> None:
+        """removes the piece(pawn) and creates a new peice as a "promotion"
+
+        Args:
+            promote (Piece): new peice
+            piece (Pawn): promoting pawn
+        """
+        if piece.color == 'white':
+            self._white_pieces.remove(piece)
+            self._white_pieces.append(promote)
+        else:
+            self._black_pieces.remove(piece)
+            self._black_pieces.append(promote)
