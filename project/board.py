@@ -159,7 +159,7 @@ class Board():
 
         # Highlights the most recent piece moved and it's old location
         if self._last_piece_moved is not None and self._old_location is not None:
-            if (self._last_piece_moved.color == "black"):
+            if self._last_piece_moved.color == "black":
                 pygame.draw.rect(screen, 'green', [w + self._old_location[0] * 100,
                                                    h + self._old_location[1] * 100, 100, 100])
                 pygame.draw.rect(screen, 'green',
@@ -354,11 +354,13 @@ class Board():
         if new_location in actual_moves:
             if isinstance(selected_piece, King):
                 last_location = selected_piece.location
-                move = selected_piece.move(new_location, self._black_location, self._white_location,
+                move = selected_piece.move(new_location,
+                                           self._black_location, self._white_location,
                                            self._black_pieces, self._white_pieces)
             else:
                 last_location = selected_piece.location
-                move = selected_piece.move(new_location, self._black_location, self._white_location)
+                move = selected_piece.move(new_location,
+                                           self._black_location, self._white_location)
 
         # removes enpassant pawn from piece list and location list
         if self._enpassant_pawn is not None and isinstance(selected_piece, Pawn):
@@ -378,7 +380,14 @@ class Board():
     def move_moved(self, color: str, selected_piece: Piece | King,
                    new_location: tuple[int, int],
                    last_location: tuple[int, int]) -> None:
-        """updating for if a piece moved"""
+        """uptates board for a peice that moved
+
+        Args:
+            color (str): turn
+            selected_piece (Piece | King): peice that player moved
+            new_location (tuple[int, int]): new location of moved pice
+            last_location (tuple[int, int]): last locaiton of moved piece
+        """
         if self._enpassant_pawn is not None and self._last_piece_moved is not None and \
                 new_location == self._enpassant_pawn.location:
             # captures the enpassant pawn
@@ -643,7 +652,7 @@ class Board():
         """checks for a checkmate
 
         Args:
-            color (str): color that just moved
+            color (str): current colors
 
         Returns:
             bool: if king is in checkmate
@@ -686,18 +695,16 @@ class Board():
         ex: w_king w_rook and b_king, w_king w_knight and b_king, etc
 
         Args:
-            color (str): color that just moved
+            color (str): current turn
 
         Returns:
             bool: is game state a stalemate
         """
         # sets friends
         if color == "white":
-            friend = self._black_pieces
-            other_color = "black"
-        else:
             friend = self._white_pieces
-            other_color = "white"
+        else:
+            friend = self._black_pieces
 
         for piece in friend:
             if isinstance(piece, King):
@@ -706,9 +713,8 @@ class Board():
                 # if king can move return false
                 if len(moves) > 0:
                     return False
-
             else:
-                moves = self.actual_moves(other_color, piece)
+                moves = self.actual_moves(color, piece)
                 # if any piece can move
                 if len(moves) > 0:
                     return False
@@ -719,7 +725,7 @@ class Board():
         else:
             stalemate = False
 
-        # if only one piece remains
+        # if only one piece remains on each side
         if len(self._white_pieces) == 1 and len(self._black_pieces) == 1:
             stalemate = True
 
@@ -746,25 +752,26 @@ class Board():
             # king is not in check
             self._in_check = None
             checkmate = False
-            stalemate = self.check_stalemate(color)  # check for stalemate
+            # check for stalemate
+            stalemate = self.check_stalemate("white" if color == "black" else "black")
 
         # if one end game conditions are met end game
         if checkmate:
-            self.end_game(color)
             return True
         elif stalemate:
-            self.end_game(color)
             return True
         return False
 
-    def end_game(self, winner: str) -> None:
-        if self._in_check is not None:
-            print(f"{winner} Wins")
-        else:
-            print("stalemate")
-
     def draw_end_popup(self, screen: pygame.surface.Surface, turn: str) -> bool:
-        """ When the game ends, fill screen with prompt to play again or quit the game."""
+        """When the game ends, fill screen with prompt
+        askingplay again or quit the game.
+        Args:
+            screen (pygame.surface.Surface): screen allowing drawing
+            turn (str): the winner, or any if stalemate
+
+        Returns:
+            bool: _description_
+        """
         screen.fill((255, 255, 255))
 
         font_header = pygame.font.Font('font/ka1.ttf', 100)
