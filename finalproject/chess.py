@@ -6,6 +6,7 @@ __license__ = "MIT"
 
 
 import pygame
+from pygame.locals import KEYDOWN, K_f
 from board import Board
 from player import Player
 
@@ -63,6 +64,11 @@ class Main():
 
             # Takes care of keyboard/mouse input
             for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == K_f and turn == "white":
+                        running = game.forfeit(turn)
+                    if event.key == K_f and turn == "black":
+                        running = game.forfeit(turn)
                 if event.type == pygame.MOUSEBUTTONDOWN and turn == "white":
                     # Handles mouse click for player 1 and gets coordinates of click
                     click = player_1.click(WIDTH, HEIGHT)

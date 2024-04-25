@@ -29,13 +29,7 @@ Chess Board Initial Layout
 """
 
 import pygame
-from pieces import Piece
-from pieces import Rook
-from pieces import Knight
-from pieces import Bishop
-from pieces import King
-from pieces import Queen
-from pieces import Pawn
+from pieces import Piece, Rook, Knight, Bishop, King, Queen, Pawn
 
 
 class Board():
@@ -149,6 +143,10 @@ class Board():
                 else:
                     pygame.draw.rect(self._screen, 'black', [w + col * 100,
                                      h + row * 100, 100, 100])
+
+        # Display that you can hit 'f' key to forfeit
+        font = pygame.font.Font('font/ka1.ttf', 20)
+        self._screen.blit(font.render("Hit 'f' to forfeit", False, 'white'), (1300, 860))
 
         # Highlights the most recent piece moved and it's old location
         if self._last_piece_moved is not None and self._old_location is not None:
@@ -395,6 +393,66 @@ class Board():
                 self._enpassant_pawn = Pawn(piece.color, (piece.location[0], 2))
         else:
             self._enpassant_pawn = None
+
+    def forfeit(self, turn: str) -> bool:
+        """
+
+        Args:
+
+        Returns:
+            bool
+        """
+        self._screen.fill('black')
+
+        font_header = pygame.font.Font('font/ka1.ttf', 100)
+        font_title = pygame.font.Font('font/ka1.ttf', 60)
+        font = pygame.font.Font('font/ka1.ttf', 36)
+
+        gameover = font_header.render("GAME OVER", True, 'red')
+        gameover_rect = gameover.get_rect(center=(self._width // 2, self._height // 5))
+        message = font_title.render("Are you sure you want to forfeit?", True, 'white')
+        message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
+        self._screen.blit(gameover, gameover_rect)
+        self._screen.blit(message, message_rect)
+
+        button_w = 150
+        button_h = 50
+        button_y = self._height // 2 + 55
+
+        play_button_x = (self._width - button_w - 250) // 2
+        quit_button_x = (self._width + 100) // 2
+
+        pygame.draw.rect(self._screen, 'green', [600, button_y, button_w, button_h])
+        pygame.draw.rect(self._screen, 'red', [quit_button_x, button_y, button_w, button_h])
+
+        yes_text = font.render("Yes", True, 'white')
+        yes_text_rect = yes_text.get_rect(center=(play_button_x + button_w // 2,
+                                                  button_y + button_h // 2))
+        self._screen.blit(yes_text, yes_text_rect)
+
+        no_text = font.render("No", True, 'white')
+        no_text_rect = no_text.get_rect(center=(quit_button_x + button_w // 2,
+                                                button_y + button_h // 2))
+        self._screen.blit(no_text, no_text_rect)
+
+        pygame.display.flip()
+
+        if (turn == "black"):
+            forfeit_winner = "white"
+        else:
+            forfeit_winner = "black"
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if (yes_text_rect.collidepoint(event.pos)):
+                        return (self.end_game(forfeit_winner))
+                        pygame.display.flip()
+                    elif (no_text_rect.collidepoint(event.pos)):
+                        pygame.display.flip()
+                        return True
 
     # flake8: noqa: C901
     def promotion(self, piece: Piece) -> None:
@@ -835,17 +893,30 @@ class Board():
     def end_game(self, winner: str) -> bool:
         """ When the game ends, fill screen with prompt to play again or quit the game."""
 
-        self._screen.fill((255, 255, 255))
+        self._screen.fill('black')
 
         font_header = pygame.font.Font('font/ka1.ttf', 100)
         font_title = pygame.font.Font('font/ka1.ttf', 70)
         font = pygame.font.Font('font/ka1.ttf', 36)
 
+        if (winner == "black"):
+            font_color = 'green'
+            win_message = "BLACK WINS"
+        else:
+            font_color = 'hot pink'
+            win_message = "WHITE WINS"
+
         gameover = font_header.render("GAME OVER", True, 'red')
         gameover_rect = gameover.get_rect(center=(self._width // 2, self._height // 5))
-        message = font_title.render("Do you want to play again?", True, 'black')
-        message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
+
+        winner_message = font_title.render(win_message, True, font_color)
+        winner_rect = winner_message.get_rect(center=(self._width // 2, self._height // 3))
+
+        message = font_title.render("Do you want to play again?", True, 'white')
+        message_rect = message.get_rect(center=(self._width // 2, self._height // 2.3))
+
         self._screen.blit(gameover, gameover_rect)
+        self._screen.blit(winner_message, winner_rect)
         self._screen.blit(message, message_rect)
 
         button_w = 150
@@ -858,12 +929,12 @@ class Board():
         pygame.draw.rect(self._screen, 'green', [500, button_y, 350, button_h])
         pygame.draw.rect(self._screen, 'red', [quit_button_x, button_y, button_w, button_h])
 
-        play_text = font.render("Play Again", True, 'black')
+        play_text = font.render("Play Again", True, 'white')
         play_text_rect = play_text.get_rect(center=(play_button_x + button_w // 2,
                                                     button_y + button_h // 2))
         self._screen.blit(play_text, play_text_rect)
 
-        quit_text = font.render("Quit", True, 'black')
+        quit_text = font.render("Quit", True, 'white')
         quit_text_rect = quit_text.get_rect(center=(quit_button_x + button_w // 2,
                                                     button_y + button_h // 2))
         self._screen.blit(quit_text, quit_text_rect)
