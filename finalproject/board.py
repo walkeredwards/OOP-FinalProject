@@ -50,7 +50,7 @@ class Board():
             screen (pygame.surface.Surface): screen
         """
         self._width: int = width  # width of pygamescreen
-        self._heght: int = height  # height of pygame screen
+        self._height: int = height  # height of pygame screen
         self._white_pieces: list[Piece | King] = []  # list of all white pieces
         self._black_pieces: list[Piece | King] = []  # list of all black pieces
         self._white_location: list[tuple[int, int]] = []  # list of white piece locations
@@ -132,7 +132,9 @@ class Board():
         """
         # finds the starting corner for the board
         w = (self._width - 800) // 2
-        h = (self._heght - 800) // 2
+        h = (self._height - 800) // 2
+
+        self._screen.fill('black')
 
         # White border around board
         pygame.draw.rect(self._screen, 'white', [395, 45, 810, 810])
@@ -176,7 +178,7 @@ class Board():
         if selected_piece is not None:
             # finds corners of board
             w = (self._width - 800) // 2
-            h = (self._heght - 800) // 2
+            h = (self._height - 800) // 2
 
             # if enpassant is available add the hidden pawn to piece list to check
             if self._enpassant_pawn is not None and isinstance(selected_piece, Pawn):
@@ -224,7 +226,7 @@ class Board():
         """
         # finds the starting corner for the board
         w = (self._width - 800) // 2
-        h = (self._heght - 800) // 2
+        h = (self._height - 800) // 2
 
         # draws white pieces
         for piece in self._white_pieces:
@@ -356,6 +358,12 @@ class Board():
             self._old_location = last_location
             self._last_piece_moved = selected_piece
 
+            if isinstance(selected_piece, Pawn):
+                if (selected_piece.color == 'black' and selected_piece.location[1] == 7):
+                    self.promotion(selected_piece)
+                elif (selected_piece.color == 'white' and selected_piece.location[1] == 0):
+                    self.promotion(selected_piece)
+
             # if a pawn moved 2 tile set up for enpassant
             if isinstance(selected_piece, Pawn) and \
                     (new_location[1] == self._old_location[1] + 2 or
@@ -387,6 +395,109 @@ class Board():
                 self._enpassant_pawn = Pawn(piece.color, (piece.location[0], 2))
         else:
             self._enpassant_pawn = None
+
+    # flake8: noqa: C901
+    def promotion(self, piece: Piece) -> None:
+        """
+        If pawn reaches end of board, player can promote to piece of choosing.
+
+        Args: piece: current pawn player is promoting
+
+        Return: None:
+        """
+        self._screen.fill((0, 0, 0))
+        font_title = pygame.font.Font('font/ka1.ttf', 70)
+
+        if (piece._color == 'white'):
+            font_color = 'hot pink'
+        else:
+            font_color = 'green'
+
+        message = font_title.render("Choose a piece to promote", True, font_color)
+        message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
+        self._screen.blit(message, message_rect)
+
+        # Draw background rects for pieces
+        x_pos = 350
+        for i in range(5):
+            pygame.draw.rect(self._screen, font_color, [x_pos, 400, 100, 100])
+            x_pos += 200
+
+        # Draw queen option
+        queen_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+                                             '/queen.png'), (90, 90))
+        queen_rect = queen_image.get_rect(topleft=(350, 400))
+        self._screen.blit(queen_image, queen_rect)
+        # Draw bishop option
+        bishop_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+                                              '/bishop.png'), (90, 90))
+        bishop_rect = bishop_image.get_rect(topleft=(550, 400))
+        self._screen.blit(bishop_image, bishop_rect)
+        # Draw rook option
+        rook_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+                                            '/rook.png'), (90, 90))
+        rook_rect = rook_image.get_rect(topleft=(750, 400))
+        self._screen.blit(rook_image, rook_rect)
+        # Draw knight option
+        knight_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+                                              '/knight.png'), (90, 90))
+        knight_rect = knight_image.get_rect(topleft=(950, 400))
+        self._screen.blit(knight_image, knight_rect)
+        # Draw pawn option
+        pawn_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+                                            '/pawn.png'), (90, 90))
+        pawn_rect = pawn_image.get_rect(topleft=(1150, 400))
+        self._screen.blit(pawn_image, pawn_rect)
+
+        pygame.display.flip()
+
+        promoted = False
+        while not promoted:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = pygame.mouse.get_pos()
+                    # Save x and y of current pawn
+                    coords = piece.location
+                    if (queen_rect.collidepoint(event.pos)):
+                        if (piece._color == 'white'):
+                            self._white_pieces.remove(piece)
+                            self._white_pieces.append(Queen("white", coords))
+                            promoted = True
+                        else:
+                            self._black_pieces.remove(piece)
+                            self._black_pieces.append(Queen("black", coords))
+                            promoted = True
+                    elif (bishop_rect.collidepoint(event.pos)):
+                        if (piece._color == 'white'):
+                            self._white_pieces.remove(piece)
+                            self._white_pieces.append(Bishop("white", coords))
+                            promoted = True
+                        else:
+                            self._black_pieces.remove(piece)
+                            self._black_pieces.append(Bishop("black", coords))
+                            promoted = True
+                    elif (rook_rect.collidepoint(event.pos)):
+                        if (piece._color == 'white'):
+                            self._white_pieces.remove(piece)
+                            self._white_pieces.append(Rook("white", coords))
+                            promoted = True
+                        else:
+                            self._black_pieces.remove(piece)
+                            self._black_pieces.append(Rook("black", coords))
+                            promoted = True
+                    elif (knight_rect.collidepoint(event.pos)):
+                        if (piece._color == 'white'):
+                            self._white_pieces.remove(piece)
+                            self._white_pieces.append(Knight("white", coords))
+                            promoted = True
+                        else:
+                            self._black_pieces.remove(piece)
+                            self._black_pieces.append(Knight("black", coords))
+                            promoted = True
+                    elif (pawn_rect.collidepoint(event.pos)):
+                        promoted = True
 
     def check_capture(self, color: str, location: tuple[int, int]) -> None:
         """checks new piece location for any captures.
@@ -731,15 +842,15 @@ class Board():
         font = pygame.font.Font('font/ka1.ttf', 36)
 
         gameover = font_header.render("GAME OVER", True, 'red')
-        gameover_rect = gameover.get_rect(center=(self._width // 2, self._heght // 5))
+        gameover_rect = gameover.get_rect(center=(self._width // 2, self._height // 5))
         message = font_title.render("Do you want to play again?", True, 'black')
-        message_rect = message.get_rect(center=(self._width // 2, self._heght // 3))
+        message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
         self._screen.blit(gameover, gameover_rect)
         self._screen.blit(message, message_rect)
 
         button_w = 150
         button_h = 50
-        button_y = self._heght // 2 + 55
+        button_y = self._height // 2 + 55
 
         play_button_x = (self._width - button_w - 250) // 2
         quit_button_x = (self._width + 100) // 2
