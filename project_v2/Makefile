@@ -9,13 +9,21 @@ all: check-style fix-style check-types run-test create-docs create-uml
 	@echo "All done!"
 
 .PHONY: run-test
-run-test:
+run-test: check-pygame
 ifeq ($(shell which pytest), ) # if pytest not found
 	@echo "pytest not found. Installing..."
 	pip install pytest
 endif
 	pytest --verbose --color=yes --cov --cov-report term --cov-report html tests/
 	@echo "All unittests passed!"
+
+.PHONY: check-pygame
+check-pygame:
+ifeq ($(shell python3 -c "import pygame" 2>/dev/null; echo $$?), 1)
+	@echo "pygame not found. Installing pygame..."
+	pip install pygame
+endif
+	@echo "pygame installed"
 
 .PHONY: check-types
 check-types:
