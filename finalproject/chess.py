@@ -70,7 +70,7 @@ class Main():
                         forfeit = game.forfeit(turn)
                     if event.key == K_f and turn == "black":
                         forfeit = game.forfeit(turn)
-        
+
                 if event.type == pygame.MOUSEBUTTONDOWN and turn == "white":
                     # Handles mouse click for player 1 and gets coordinates of click
                     click = player_1.click(WIDTH, HEIGHT)
