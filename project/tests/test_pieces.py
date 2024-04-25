@@ -1,5 +1,8 @@
 """tests for pieces"""
 
+import unittest
+from hypothesis import given
+import hypothesis.strategies as some
 from pieces import Piece
 from pieces import Rook
 from pieces import Knight
@@ -7,9 +10,6 @@ from pieces import Bishop
 from pieces import Queen
 from pieces import King
 from pieces import Pawn
-import unittest
-from hypothesis import given
-import hypothesis.strategies as some
 
 HYP_LOCATION = some.tuples(some.integers(min_value=0, max_value=7),
                            some.integers(min_value=0, max_value=7))
@@ -518,13 +518,6 @@ class TestPawn(unittest.TestCase):
 
 class TestKing(unittest.TestCase):
     """tests for King"""
-
-    """
-    possible moves
-    move
-    castle move
-    is safe
-    """
     @given(location=HYP_LOCATION, color=HYP_COLOR)
     def test_king_prop(self, color: str, location: tuple[int, int]) -> None:
         """test properties"""
