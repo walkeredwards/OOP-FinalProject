@@ -17,6 +17,7 @@ class Board {
     + select(): Piece | King | None
     + move(): bool
     + enpassant(): None
+    + forfeit(): bool
     + check_capture(): None
     + is_in_check(): bool
     + in_check_block(): list[tuple[int, int]]
