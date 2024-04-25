@@ -408,11 +408,11 @@ class Board():
         font_title = pygame.font.Font('font/ka1.ttf', 60)
         font = pygame.font.Font('font/ka1.ttf', 36)
 
-        gameover = font_header.render("FORFEIT?", True, 'red')
-        gameover_rect = gameover.get_rect(center=(self._width // 2, self._height // 5))
+        forfeit_message = font_header.render("FORFEIT?", True, 'red')
+        forfeit_rect = forfeit_message.get_rect(center=(self._width // 2, self._height // 5))
         message = font_title.render("Are you sure you want to forfeit?", True, 'white')
         message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
-        self._screen.blit(gameover, gameover_rect)
+        self._screen.blit(forfeit_message, forfeit_rect)
         self._screen.blit(message, message_rect)
 
         button_w = 150
