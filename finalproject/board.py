@@ -448,7 +448,7 @@ class Board():
                     return False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if (yes_text_rect.collidepoint(event.pos)):
-                        if ( not self.end_game(forfeit_winner)):
+                        if (not self.end_game(forfeit_winner)):
                             return True
                     elif (no_text_rect.collidepoint(event.pos)):
                         return False

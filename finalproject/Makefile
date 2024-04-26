@@ -5,7 +5,7 @@ PROBLEM = chess
 PYTHON = python3
 
 .PHONY: all
-all: check-style fix-style check-types run-test create-docs create-uml
+all: check-pygame check-style fix-style check-types run-test create-docs create-uml
 	@echo "All done!"
 
 .PHONY: run-test

@@ -4,7 +4,7 @@ __authors__ = "Bryleigh Koci, Walker Edwards, Elena Schmitt"
 __date__ = "26 April 2024"
 __license__ = "MIT"
 
-""" Player Class"""
+""" Player class"""
 
 import pygame
 from pieces import Piece
