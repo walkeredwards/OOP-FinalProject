@@ -2,6 +2,7 @@
 scale 2
 title "Chess Game Classes Diagram"
 class Main {
+    - _caption: str
     + main(): None
 }
 
@@ -17,7 +18,6 @@ class Board {
     + select(): Piece | King | None
     + move(): bool
     + enpassant(): None
-    + forfeit(): bool
     + check_capture(): None
     + is_in_check(): bool
     + in_check_block(): list[tuple[int, int]]
@@ -80,6 +80,7 @@ Main --> Player
 Board --> Piece
 Player --> Piece
 
+King --> Piece
 Piece <|-- Pawn
 Piece <|-- Bishop
 Piece <|-- Knight
