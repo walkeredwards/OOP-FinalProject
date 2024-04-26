@@ -394,65 +394,6 @@ class Board():
         else:
             self._enpassant_pawn = None
 
-    def forfeit(self, turn: str) -> bool:
-        """
-
-        Args:
-
-        Returns:
-            bool
-        """
-        self._screen.fill('black')
-
-        font_header = pygame.font.Font('font/ka1.ttf', 100)
-        font_title = pygame.font.Font('font/ka1.ttf', 60)
-        font = pygame.font.Font('font/ka1.ttf', 36)
-
-        forfeit_message = font_header.render("FORFEIT?", True, 'red')
-        forfeit_rect = forfeit_message.get_rect(center=(self._width // 2, self._height // 5))
-        message = font_title.render("Are you sure you want to forfeit?", True, 'white')
-        message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
-        self._screen.blit(forfeit_message, forfeit_rect)
-        self._screen.blit(message, message_rect)
-
-        button_w = 150
-        button_h = 50
-        button_y = self._height // 2 + 55
-
-        play_button_x = (self._width - button_w - 250) // 2
-        quit_button_x = (self._width + 100) // 2
-
-        pygame.draw.rect(self._screen, 'green', [600, button_y, button_w, button_h])
-        pygame.draw.rect(self._screen, 'red', [quit_button_x, button_y, button_w, button_h])
-
-        yes_text = font.render("Yes", True, 'white')
-        yes_text_rect = yes_text.get_rect(center=(play_button_x + button_w // 2,
-                                                  button_y + button_h // 2))
-        self._screen.blit(yes_text, yes_text_rect)
-
-        no_text = font.render("No", True, 'white')
-        no_text_rect = no_text.get_rect(center=(quit_button_x + button_w // 2,
-                                                button_y + button_h // 2))
-        self._screen.blit(no_text, no_text_rect)
-
-        pygame.display.flip()
-
-        if (turn == "black"):
-            forfeit_winner = "white"
-        else:
-            forfeit_winner = "black"
-
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    return False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if (yes_text_rect.collidepoint(event.pos)):
-                        if (not self.end_game(forfeit_winner)):
-                            return True
-                    elif (no_text_rect.collidepoint(event.pos)):
-                        return False
-
     # flake8: noqa: C901
     def promotion(self, piece: Piece) -> None:
         """
