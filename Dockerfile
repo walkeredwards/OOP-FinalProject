@@ -9,6 +9,9 @@ RUN apt update \
 # Install Java and Graphviz for plantuml
 RUN apt install default-jre graphviz -y
 
+# Disable ALSA so that pygame can run
+RUN echo "pcm.!default null\\nctl.!default null" > /etc/asound.conf
+
 ARG USER=user
 ARG UID=1000
 ARG GID=1000
