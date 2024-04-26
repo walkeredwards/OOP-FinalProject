@@ -28,8 +28,18 @@ Chess Board Initial Layout
   WR     WK     WB     WQ     WK     WB     WK     WR
 """
 
+__authors__ = "Bryleigh Koci, Walker Edwards, Elena Schmitt"
+__date__ = "26 April 2024"
+__license__ = "MIT"
+
 import pygame
-from pieces import Piece, Rook, Knight, Bishop, King, Queen, Pawn
+from pieces import Piece
+from pieces import Rook
+from pieces import Knight
+from pieces import Bishop
+from pieces import King
+from pieces import Queen
+from pieces import Pawn
 
 
 class Board():
@@ -41,7 +51,6 @@ class Board():
         Args:
             width (int): width of screen
             height (int): height of screen
-            screen (pygame.surface.Surface): screen
         """
         self._width: int = width  # width of pygamescreen
         self._height: int = height  # height of pygame screen
@@ -62,11 +71,17 @@ class Board():
         # invisable pawn that will allow enpassant
         self._enpassant_pawn: Piece | King | None = None
 
+        # pygame screen
         self._screen = screen
+
+    @property
+    def in_check(self) -> King | None:
+        """lets Chess driver know if in check"""
+        return self._in_check
 
     # Set up the chess pieces on the board
     def setup_pieces(self) -> None:
-        """ Creates pieces and stores them in the corresponding list"""
+        """creates peces and stores them in the corrisponding list"""
 
         # Initialize black pieces for player 2 and put them in the pieces list
         # Row 1
@@ -121,14 +136,31 @@ class Board():
         # updates locations for all pieces
         self.update_locations()
 
-    def make_board(self) -> None:
+    def make_board(self, turn: str) -> None:
         """Set up the squares on the board
+
+        Args:
+            turn : player's turn
         """
+        # Set up fonts
+        font = pygame.font.Font('font/ka1.ttf', 30)
+
         # finds the starting corner for the board
         w = (self._width - 800) // 2
         h = (self._height - 800) // 2
 
+        # blackout previous
         self._screen.fill('black')
+
+        # turn text
+        if turn == "black":
+            self._screen.blit(font.render("BLACK'S TURN", False, 'green'), (660, 5))
+        else:
+            self._screen.blit(font.render("WHITE'S TURN", False, 'hot pink'), (660, 860))
+
+        # Display that you can hit 'f' key to forfeit
+        font = pygame.font.Font('font/ka1.ttf', 20)
+        self._screen.blit(font.render("Hit 'f' to forfeit", False, 'white'), (1300, 860))
 
         # White border around board
         pygame.draw.rect(self._screen, 'white', [395, 45, 810, 810])
@@ -138,50 +170,53 @@ class Board():
             for col in range(8):
                 # creates checkerd pattern
                 if (row + col) % 2 == 0:
-                    pygame.draw.rect(self._screen, 'white', [w + col * 100,
-                                     h + row * 100, 100, 100])
+                    pygame.draw.rect(self._screen, 'white',
+                                     [w + col * 100, h + row * 100, 100, 100])
                 else:
-                    pygame.draw.rect(self._screen, 'black', [w + col * 100,
-                                     h + row * 100, 100, 100])
-
-        # Display that you can hit 'f' key to forfeit
-        font = pygame.font.Font('font/ka1.ttf', 20)
-        self._screen.blit(font.render("Hit 'f' to forfeit", False, 'white'), (1300, 860))
+                    pygame.draw.rect(self._screen, 'black',
+                                     [w + col * 100, h + row * 100, 100, 100])
 
         # Highlights the most recent piece moved and it's old location
         if self._last_piece_moved is not None and self._old_location is not None:
-            if (self._last_piece_moved._color == "black"):
-                square_color = 'green'
+            if self._last_piece_moved.color == "black":
+                pygame.draw.rect(self._screen, 'green', [w + self._old_location[0] * 100,
+                                                         h + self._old_location[1] * 100, 100, 100])
+                pygame.draw.rect(self._screen, 'green',
+                                 [w + self._last_piece_moved.location[0] * 100,
+                                  h + self._last_piece_moved.location[1] * 100,
+                                  100, 100])
             else:
-                square_color = 'hot pink'
-            pygame.draw.rect(self._screen, square_color, [w + self._old_location[0] * 100,
-                             h + self._old_location[1] * 100, 100, 100])
-            pygame.draw.rect(self._screen, square_color,
-                             [w + self._last_piece_moved.location[0] * 100,
-                              h + self._last_piece_moved.location[1] * 100,
-                              100, 100])
+                pygame.draw.rect(self._screen, 'hot pink',
+                                 [w + self._old_location[0] * 100,
+                                  h + self._old_location[1] * 100, 100, 100])
+                pygame.draw.rect(self._screen, 'hot pink',
+                                 [w + self._last_piece_moved.location[0] * 100,
+                                  h + self._last_piece_moved.location[1] * 100,
+                                  100, 100])
 
-        # highlights king in check with red
+        # Highlights king in check with red
         if self._in_check is not None:
-            pygame.draw.rect(self._screen, "red", [w + self._in_check.location[0] * 100,
+            pygame.draw.rect(self._screen, 'red', [w + self._in_check.location[0] * 100,
                              h + self._in_check.location[1] * 100, 100, 100])
 
-    def highlight_selected(self, selected_piece: Piece | King | None, turn: str) -> None:
+    def highlight_selected(self, selected_piece: Piece | King | None,
+                           turn: str) -> None:
         """if player selected piece is not none
         then highlight all possible locations it can move to
 
         Args:
             selected_piece (tuple): player selected piece
+            turn (str): current turn
         """
         if selected_piece is not None:
             # finds corners of board
             w = (self._width - 800) // 2
             h = (self._height - 800) // 2
 
-            # if enpassant is available add the hidden pawn to piece list to check
+            # if enpassant is avalible add the hidden pawn to piece list to check
             if self._enpassant_pawn is not None and isinstance(selected_piece, Pawn):
                 if turn == "white":
-                    # appends enpassant pawn and location
+                    # appends enpassont pawn and location
                     self._black_pieces.append(self._enpassant_pawn)
                     self._black_location.append(self._enpassant_pawn.location)
                     # finds moves
@@ -205,19 +240,23 @@ class Board():
             # adds current piece tile for highlight
             moves.append(selected_piece.location)
 
-            if (turn == "black"):
-                square_color = 'green'
-            else:
-                square_color = 'hot pink'
-
-            pygame.draw.rect(self._screen, square_color,
-                             [w + selected_piece.location[0] * 100,
-                              h + selected_piece.location[1] * 100, 100, 100])
-
-            # draws the available moves
+            # draws the avalible moves
             for tile in moves:
-                pygame.draw.rect(self._screen, square_color,
-                                 [w + tile[0] * 100, h + tile[1] * 100, 100, 100], 3)
+                if turn == "black":
+                    pygame.draw.rect(self._screen, 'green',
+                                     [w + selected_piece.location[0] * 100,
+                                      h + selected_piece.location[1] * 100, 100, 100])
+                    pygame.draw.rect(self._screen, 'green',
+                                     [w + tile[0] * 100,
+                                      h + tile[1] * 100, 100, 100], 3)
+                else:
+                    pygame.draw.rect(self._screen, 'hot pink',
+                                     [w + selected_piece.location[0] * 100,
+                                      h + selected_piece.location[1] * 100,
+                                      100, 100])
+                    pygame.draw.rect(self._screen, 'hot pink',
+                                     [w + tile[0] * 100, h + tile[1] * 100,
+                                      100, 100], 3)
 
     def draw_pieces(self) -> None:
         """draws the pieces
@@ -246,7 +285,7 @@ class Board():
                     self._screen.blit(piece.image, (10 + white_capture_count * 35, h + 0 * 100))
                 else:
                     self._screen.blit(piece.image, (10 + (white_capture_count - 7) * 35,
-                                      (h * 1.5) + 0 * 100))
+                                                    (h * 1.5) + 0 * 100))
                 white_capture_count += 1
             elif piece.color == "black":
                 # ammount in one row before going down
@@ -254,7 +293,7 @@ class Board():
                     self._screen.blit(piece.image, (10 + black_capture_count * 35, h + 7 * 100))
                 else:
                     self._screen.blit(piece.image, (10 + (black_capture_count - 7) * 35,
-                                      (h * 1.5) + 7 * 100))
+                                                    (h * 1.5) + 7 * 100))
                 black_capture_count += 1
 
     def update_locations(self) -> None:
@@ -299,8 +338,8 @@ class Board():
                     return piece
         return None
 
-    def move(self, color: str, selected_piece: Piece | King,
-             new_location: tuple[int, int]) -> bool:
+    def move_check(self, color: str, selected_piece: Piece | King,
+                   new_location: tuple[int, int]) -> bool:
         """moves a piece
 
         Args:
@@ -327,15 +366,17 @@ class Board():
         # find actual moves for piece
         actual_moves = self.actual_moves(color, selected_piece)
 
-        # checks if available and moves if new_location is in actual_moves
+        # checks if avalible and moves if new_location is in actual_moves
         if new_location in actual_moves:
             if isinstance(selected_piece, King):
                 last_location = selected_piece.location
-                move = selected_piece.move(new_location, self._black_location, self._white_location,
+                move = selected_piece.move(new_location,
+                                           self._black_location, self._white_location,
                                            self._black_pieces, self._white_pieces)
             else:
                 last_location = selected_piece.location
-                move = selected_piece.move(new_location, self._black_location, self._white_location)
+                move = selected_piece.move(new_location,
+                                           self._black_location, self._white_location)
 
         # removes enpassant pawn from piece list and location list
         if self._enpassant_pawn is not None and isinstance(selected_piece, Pawn):
@@ -348,35 +389,48 @@ class Board():
 
         # if the piece actually moved update info
         if move:
-            if self._enpassant_pawn is not None and self._last_piece_moved is not None and \
-                    new_location == self._enpassant_pawn.location:
-                # captures the enpassant pawn
-                self.check_capture(color, self._last_piece_moved.location)
-
-            self._old_location = last_location
-            self._last_piece_moved = selected_piece
-
-            if isinstance(selected_piece, Pawn):
-                if (selected_piece.color == 'black' and selected_piece.location[1] == 7):
-                    self.promotion(selected_piece)
-                elif (selected_piece.color == 'white' and selected_piece.location[1] == 0):
-                    self.promotion(selected_piece)
-
-            # if a pawn moved 2 tile set up for enpassant
-            if isinstance(selected_piece, Pawn) and \
-                    (new_location[1] == self._old_location[1] + 2 or
-                     new_location[1] == self._old_location[1] - 2):
-                self.enpassant(selected_piece, True)
-            else:
-                # reset enpassant to false
-                self.enpassant(selected_piece, False)
-
-            # captures any pieces
-            self.check_capture(color, new_location)
-            # update piece locations
-            self.update_locations()
+            self.move_moved(color, selected_piece, new_location, last_location)
 
         return move
+
+    def move_moved(self, color: str, selected_piece: Piece | King,
+                   new_location: tuple[int, int],
+                   last_location: tuple[int, int]) -> None:
+        """uptates board for a piece that moved
+
+        Args:
+            color (str): turn
+            selected_piece (Piece | King): piece that player moved
+            new_location (tuple[int, int]): new location of moved pice
+            last_location (tuple[int, int]): last locaiton of moved piece
+        """
+        if self._enpassant_pawn is not None and self._last_piece_moved is not None and \
+                new_location == self._enpassant_pawn.location:
+            # captures the enpassant pawn
+            self.check_capture(color, self._last_piece_moved.location)
+
+        self._old_location = last_location
+        self._last_piece_moved = selected_piece
+
+        if isinstance(selected_piece, Pawn):
+            if (selected_piece.color == 'black' and selected_piece.location[1] == 7):
+                self.promotion(selected_piece)
+            elif (selected_piece.color == 'white' and selected_piece.location[1] == 0):
+                self.promotion(selected_piece)
+
+        # if a pawn moved 2 tile set up for enpassant
+        if isinstance(selected_piece, Pawn) and \
+                (new_location[1] == self._old_location[1] + 2 or
+                 new_location[1] == self._old_location[1] - 2):
+            self.enpassant(selected_piece, True)
+        else:
+            # reset enpassant to false
+            self.enpassant(selected_piece, False)
+
+        # captures any pieces
+        self.check_capture(color, new_location)
+        # update piece locations
+        self.update_locations()
 
     def enpassant(self, piece: Piece | King, able: bool) -> None:
         """sets flags to indicate if a pawn can capture via enpassant
@@ -393,109 +447,6 @@ class Board():
                 self._enpassant_pawn = Pawn(piece.color, (piece.location[0], 2))
         else:
             self._enpassant_pawn = None
-
-    # flake8: noqa: C901
-    def promotion(self, piece: Piece) -> None:
-        """
-        If pawn reaches end of board, player can promote to piece of choosing.
-
-        Args: piece: current pawn player is promoting
-
-        Return: None:
-        """
-        self._screen.fill((0, 0, 0))
-        font_title = pygame.font.Font('font/ka1.ttf', 70)
-
-        if (piece._color == 'white'):
-            font_color = 'hot pink'
-        else:
-            font_color = 'green'
-
-        message = font_title.render("Choose a piece to promote", True, font_color)
-        message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
-        self._screen.blit(message, message_rect)
-
-        # Draw background rects for pieces
-        x_pos = 350
-        for i in range(5):
-            pygame.draw.rect(self._screen, font_color, [x_pos, 400, 100, 100])
-            x_pos += 200
-
-        # Draw queen option
-        queen_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
-                                             '/queen.png'), (90, 90))
-        queen_rect = queen_image.get_rect(topleft=(350, 400))
-        self._screen.blit(queen_image, queen_rect)
-        # Draw bishop option
-        bishop_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
-                                              '/bishop.png'), (90, 90))
-        bishop_rect = bishop_image.get_rect(topleft=(550, 400))
-        self._screen.blit(bishop_image, bishop_rect)
-        # Draw rook option
-        rook_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
-                                            '/rook.png'), (90, 90))
-        rook_rect = rook_image.get_rect(topleft=(750, 400))
-        self._screen.blit(rook_image, rook_rect)
-        # Draw knight option
-        knight_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
-                                              '/knight.png'), (90, 90))
-        knight_rect = knight_image.get_rect(topleft=(950, 400))
-        self._screen.blit(knight_image, knight_rect)
-        # Draw pawn option
-        pawn_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
-                                            '/pawn.png'), (90, 90))
-        pawn_rect = pawn_image.get_rect(topleft=(1150, 400))
-        self._screen.blit(pawn_image, pawn_rect)
-
-        pygame.display.flip()
-
-        promoted = False
-        while not promoted:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    x, y = pygame.mouse.get_pos()
-                    # Save x and y of current pawn
-                    coords = piece.location
-                    if (queen_rect.collidepoint(event.pos)):
-                        if (piece._color == 'white'):
-                            self._white_pieces.remove(piece)
-                            self._white_pieces.append(Queen("white", coords))
-                            promoted = True
-                        else:
-                            self._black_pieces.remove(piece)
-                            self._black_pieces.append(Queen("black", coords))
-                            promoted = True
-                    elif (bishop_rect.collidepoint(event.pos)):
-                        if (piece._color == 'white'):
-                            self._white_pieces.remove(piece)
-                            self._white_pieces.append(Bishop("white", coords))
-                            promoted = True
-                        else:
-                            self._black_pieces.remove(piece)
-                            self._black_pieces.append(Bishop("black", coords))
-                            promoted = True
-                    elif (rook_rect.collidepoint(event.pos)):
-                        if (piece._color == 'white'):
-                            self._white_pieces.remove(piece)
-                            self._white_pieces.append(Rook("white", coords))
-                            promoted = True
-                        else:
-                            self._black_pieces.remove(piece)
-                            self._black_pieces.append(Rook("black", coords))
-                            promoted = True
-                    elif (knight_rect.collidepoint(event.pos)):
-                        if (piece._color == 'white'):
-                            self._white_pieces.remove(piece)
-                            self._white_pieces.append(Knight("white", coords))
-                            promoted = True
-                        else:
-                            self._black_pieces.remove(piece)
-                            self._black_pieces.append(Knight("black", coords))
-                            promoted = True
-                    elif (pawn_rect.collidepoint(event.pos)):
-                        promoted = True
 
     def check_capture(self, color: str, location: tuple[int, int]) -> None:
         """checks new piece location for any captures.
@@ -593,7 +544,7 @@ class Board():
         return block_tile
 
     def actual_moves(self, color: str, piece: Piece | King) -> list[tuple[int, int]]:
-        """finds the actual available moves for a piece
+        """finds the actual avalible moves for a piece
 
         Args:
             color (str): color of piece
@@ -630,7 +581,7 @@ class Board():
                 block_moves = self.in_check_block(color)  # finds blockable tiles
                 for coord in selected_moves:
                     if coord in block_moves:
-                        # if the possible move is in blockable moves append to available
+                        # if the possible move is in blockable moves append to avalible
                         moves.append(coord)
 
             # check if move dosn't put king in check
@@ -717,11 +668,12 @@ class Board():
         """checks for a checkmate
 
         Args:
-            color (str): color that just moved
+            color (str): current colors
 
         Returns:
             bool: if king is in checkmate
         """
+
         king_can_move = False
         can_block = False
         block_tiles = self.in_check_block(color)
@@ -759,18 +711,16 @@ class Board():
         ex: w_king w_rook and b_king, w_king w_knight and b_king, etc
 
         Args:
-            color (str): color that just moved
+            color (str): current turn
 
         Returns:
             bool: is game state a stalemate
         """
         # sets friends
         if color == "white":
-            friend = self._black_pieces
-            other_color = "black"
-        else:
             friend = self._white_pieces
-            other_color = "white"
+        else:
+            friend = self._black_pieces
 
         for piece in friend:
             if isinstance(piece, King):
@@ -779,9 +729,8 @@ class Board():
                 # if king can move return false
                 if len(moves) > 0:
                     return False
-
             else:
-                moves = self.actual_moves(other_color, piece)
+                moves = self.actual_moves(color, piece)
                 # if any piece can move
                 if len(moves) > 0:
                     return False
@@ -792,7 +741,7 @@ class Board():
         else:
             stalemate = False
 
-        # if only one piece remains
+        # if only one piece remains on each side
         if len(self._white_pieces) == 1 and len(self._black_pieces) == 1:
             stalemate = True
 
@@ -819,75 +768,99 @@ class Board():
             # king is not in check
             self._in_check = None
             checkmate = False
-            stalemate = self.check_stalemate(color)  # check for stalemate
+            # check for stalemate
+            stalemate = self.check_stalemate("white" if color == "black" else "black")
 
         # if one end game conditions are met end game
         if checkmate:
-            self.end_game(color)
             return True
         elif stalemate:
-            self.end_game(color)
             return True
         return False
 
-    def end_game(self, winner: str) -> bool:
-        """ When the game ends, fill screen with prompt to play again or quit the game."""
+    def promotion(self, piece: Pawn) -> None:
+        """
+        If pawn reaches end of board, player can promote to piece of choosing.
 
-        self._screen.fill('black')
+        Args: piece: current pawn player is promoting
 
-        font_winner = pygame.font.Font('font/ka1.ttf', 120)
-        font_header = pygame.font.Font('font/ka1.ttf', 100)
+        Return: None:
+        """
+        self._screen.fill((0, 0, 0))
         font_title = pygame.font.Font('font/ka1.ttf', 70)
-        font = pygame.font.Font('font/ka1.ttf', 36)
 
-        if (winner == "black"):
-            font_color = 'green'
-            win_message = "BLACK WINS"
-        else:
-            font_color = 'hot pink'
-            win_message = "WHITE WINS"
+        font_color = 'hot pink' if piece.color == 'white' else 'green'
 
-        gameover = font_header.render("GAME OVER", True, 'red')
-        gameover_rect = gameover.get_rect(center=(self._width // 2, self._height // 3.5))
-
-        winner_message = font_winner.render(win_message, True, font_color)
-        winner_rect = winner_message.get_rect(center=(self._width // 2, self._height // 7))
-
-        message = font_title.render("Do you want to play again?", True, 'white')
-        message_rect = message.get_rect(center=(self._width // 2, self._height // 2.3))
-
-        self._screen.blit(gameover, gameover_rect)
-        self._screen.blit(winner_message, winner_rect)
+        message = font_title.render("Choose a piece to promote", True, font_color)
+        message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
         self._screen.blit(message, message_rect)
 
-        button_w = 150
-        button_h = 50
-        button_y = self._height // 2 + 55
+        # Draw background rects for pieces
+        x_pos = 450
+        for i in range(4):
+            pygame.draw.rect(self._screen, font_color, [x_pos, 400, 100, 100])
+            x_pos += 200
 
-        play_button_x = (self._width - button_w - 250) // 2
-        quit_button_x = (self._width + 100) // 2
-
-        pygame.draw.rect(self._screen, 'green', [500, button_y, 350, button_h])
-        pygame.draw.rect(self._screen, 'red', [quit_button_x, button_y, button_w, button_h])
-
-        play_text = font.render("Play Again", True, 'white')
-        play_text_rect = play_text.get_rect(center=(play_button_x + button_w // 2,
-                                                    button_y + button_h // 2))
-        self._screen.blit(play_text, play_text_rect)
-
-        quit_text = font.render("Quit", True, 'white')
-        quit_text_rect = quit_text.get_rect(center=(quit_button_x + button_w // 2,
-                                                    button_y + button_h // 2))
-        self._screen.blit(quit_text, quit_text_rect)
+        # Draw queen option
+        queen_image = pygame.transform.scale(pygame.image.load('images/' + piece.color +
+                                             '/queen.png'), (90, 90))
+        queen_rect = queen_image.get_rect(topleft=(450, 400))
+        self._screen.blit(queen_image, queen_rect)
+        # Draw bishop option
+        bishop_image = pygame.transform.scale(pygame.image.load('images/' + piece.color +
+                                              '/bishop.png'), (90, 90))
+        bishop_rect = bishop_image.get_rect(topleft=(650, 400))
+        self._screen.blit(bishop_image, bishop_rect)
+        # Draw rook option
+        rook_image = pygame.transform.scale(pygame.image.load('images/' + piece.color +
+                                            '/rook.png'), (90, 90))
+        rook_rect = rook_image.get_rect(topleft=(850, 400))
+        self._screen.blit(rook_image, rook_rect)
+        # Draw knight option
+        knight_image = pygame.transform.scale(pygame.image.load('images/' + piece.color +
+                                              '/knight.png'), (90, 90))
+        knight_rect = knight_image.get_rect(topleft=(1050, 400))
+        self._screen.blit(knight_image, knight_rect)
 
         pygame.display.flip()
 
-        while True:
+        promoted = False
+        while not promoted:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return False
+                    pygame.quit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if (quit_text_rect.collidepoint(event.pos)):
-                        return False
-                    elif (play_text_rect.collidepoint(event.pos)):
-                        return True
+                    coords = piece.location
+                    color = piece.color
+                    new_piece: Piece
+
+                    if queen_rect.collidepoint(event.pos):
+                        new_piece = Queen(color, coords)
+                        self.promote_piece(new_piece, piece)
+                        promoted = True
+                    elif bishop_rect.collidepoint(event.pos):
+                        new_piece = Bishop(color, coords)
+                        self.promote_piece(new_piece, piece)
+                        promoted = True
+                    elif rook_rect.collidepoint(event.pos):
+                        new_piece = Rook(color, coords)
+                        self.promote_piece(new_piece, piece)
+                        promoted = True
+                    elif knight_rect.collidepoint(event.pos):
+                        new_piece = Knight(color, coords)
+                        self.promote_piece(new_piece, piece)
+                        promoted = True
+
+    def promote_piece(self, promote: Piece, piece: Pawn) -> None:
+        """removes the piece(pawn) and creates a new piece as a "promotion"
+
+        Args:
+            promote (Piece): new piece
+            piece (Pawn): promoting pawn
+        """
+        if piece.color == 'white':
+            self._white_pieces.remove(piece)
+            self._white_pieces.append(promote)
+        else:
+            self._black_pieces.remove(piece)
+            self._black_pieces.append(promote)
