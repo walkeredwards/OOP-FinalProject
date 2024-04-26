@@ -14,9 +14,6 @@ from pieces import Pawn
 HYP_LOCATION = some.tuples(some.integers(min_value=0, max_value=7),
                            some.integers(min_value=0, max_value=7))
 HYP_COLOR = some.one_of(some.just("black"), some.just("white"))
-HYP_OTHER_LOCATION = some.lists(some.tuples(some.integers(min_value=0, max_value=7),
-                                            some.integers(min_value=0, max_value=7)),
-                                min_size=0, max_size=15)
 
 
 class TestRook(unittest.TestCase):

@@ -123,11 +123,11 @@ class Board():
         # updates locations for all pieces
         self.update_locations()
 
-    def make_board(self, screen: pygame.surface.Surface, turn: str) -> None:
+    def make_board(self, turn: str) -> None:
         """Set up the squares on the board
 
         Args:
-            screen : pygame screen
+            turn : player's turn
         """
         # Set up fonts
         font = pygame.font.Font('font/ka1.ttf', 30)
@@ -137,57 +137,59 @@ class Board():
         h = (self._height - 800) // 2
 
         # blackout previous
-        screen.fill('black')
+        self._screen.fill('black')
 
         # turn text
         if turn == "black":
-            screen.blit(font.render("BLACK'S TURN", False, 'green'), (660, 5))
+            self._screen.blit(font.render("BLACK'S TURN", False, 'green'), (660, 5))
         else:
-            screen.blit(font.render("WHITE'S TURN", False, 'hot pink'), (660, 860))
+            self._screen.blit(font.render("WHITE'S TURN", False, 'hot pink'), (660, 860))
 
         # White border around board
-        pygame.draw.rect(screen, 'white', [395, 45, 810, 810])
+        pygame.draw.rect(self._screen, 'white', [395, 45, 810, 810])
 
         # draws tiles for board
         for row in range(8):
             for col in range(8):
                 # creates checkerd pattern
                 if (row + col) % 2 == 0:
-                    pygame.draw.rect(screen, 'white', [w + col * 100, h + row * 100, 100, 100])
+                    pygame.draw.rect(self._screen, 'white',
+                                     [w + col * 100, h + row * 100, 100, 100])
                 else:
-                    pygame.draw.rect(screen, 'black', [w + col * 100, h + row * 100, 100, 100])
+                    pygame.draw.rect(self._screen, 'black',
+                                     [w + col * 100, h + row * 100, 100, 100])
 
         # Highlights the most recent piece moved and it's old location
         if self._last_piece_moved is not None and self._old_location is not None:
             if self._last_piece_moved.color == "black":
-                pygame.draw.rect(screen, 'green', [w + self._old_location[0] * 100,
-                                                   h + self._old_location[1] * 100, 100, 100])
-                pygame.draw.rect(screen, 'green',
+                pygame.draw.rect(self._screen, 'green', [w + self._old_location[0] * 100,
+                                                         h + self._old_location[1] * 100, 100, 100])
+                pygame.draw.rect(self._screen, 'green',
                                  [w + self._last_piece_moved.location[0] * 100,
                                   h + self._last_piece_moved.location[1] * 100,
                                   100, 100])
             else:
-                pygame.draw.rect(screen, 'hot pink',
+                pygame.draw.rect(self._screen, 'hot pink',
                                  [w + self._old_location[0] * 100,
                                   h + self._old_location[1] * 100, 100, 100])
-                pygame.draw.rect(screen, 'hot pink',
+                pygame.draw.rect(self._screen, 'hot pink',
                                  [w + self._last_piece_moved.location[0] * 100,
                                   h + self._last_piece_moved.location[1] * 100,
                                   100, 100])
 
         # Highlights king in check with red
         if self._in_check is not None:
-            pygame.draw.rect(screen, 'red', [w + self._in_check.location[0] * 100,
+            pygame.draw.rect(self._screen, 'red', [w + self._in_check.location[0] * 100,
                              h + self._in_check.location[1] * 100, 100, 100])
 
     def highlight_selected(self, selected_piece: Piece | King | None,
-                           screen: pygame.surface.Surface, turn: str) -> None:
+                           turn: str) -> None:
         """if player selected piece is not none
         then highlight all possible locations it can move to
 
         Args:
             selected_piece (tuple): player selected piece
-            screen (_type_): screen to display
+            turn (str): current turn
         """
         if selected_piece is not None:
             # finds corners of board
@@ -224,26 +226,23 @@ class Board():
             # draws the avalible moves
             for tile in moves:
                 if turn == "black":
-                    pygame.draw.rect(screen, 'green',
+                    pygame.draw.rect(self._screen, 'green',
                                      [w + selected_piece.location[0] * 100,
                                       h + selected_piece.location[1] * 100, 100, 100])
-                    pygame.draw.rect(screen, 'green',
+                    pygame.draw.rect(self._screen, 'green',
                                      [w + tile[0] * 100,
                                       h + tile[1] * 100, 100, 100], 3)
                 else:
-                    pygame.draw.rect(screen, 'hot pink',
+                    pygame.draw.rect(self._screen, 'hot pink',
                                      [w + selected_piece.location[0] * 100,
                                       h + selected_piece.location[1] * 100,
                                       100, 100])
-                    pygame.draw.rect(screen, 'hot pink',
+                    pygame.draw.rect(self._screen, 'hot pink',
                                      [w + tile[0] * 100, h + tile[1] * 100,
                                       100, 100], 3)
 
-    def draw_pieces(self, screen: pygame.surface.Surface) -> None:
+    def draw_pieces(self) -> None:
         """draws the pieces
-
-        Args:
-            screen : pygame screen
         """
         # finds the starting corner for the board
         w = (self._width - 800) // 2
@@ -252,12 +251,12 @@ class Board():
         # draws white pieces
         for piece in self._white_pieces:
             xy_location = piece.location
-            screen.blit(piece.image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
+            self._screen.blit(piece.image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
 
         # draws black pieces
         for piece in self._black_pieces:
             xy_location = piece.location
-            screen.blit(piece.image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
+            self._screen.blit(piece.image, (w + xy_location[0] * 100, h + xy_location[1] * 100))
 
         # draws captured pieces to the side
         white_capture_count = 0  # counts ammount of captured white that have been drawn
@@ -266,18 +265,18 @@ class Board():
             if piece.color == "white":
                 # ammount in one row before going down
                 if white_capture_count < 7:
-                    screen.blit(piece.image, (10 + white_capture_count * 35, h + 0 * 100))
+                    self._screen.blit(piece.image, (10 + white_capture_count * 35, h + 0 * 100))
                 else:
-                    screen.blit(piece.image, (10 + (white_capture_count - 7) * 35,
-                                              (h * 1.5) + 0 * 100))
+                    self._screen.blit(piece.image, (10 + (white_capture_count - 7) * 35,
+                                                    (h * 1.5) + 0 * 100))
                 white_capture_count += 1
             elif piece.color == "black":
                 # ammount in one row before going down
                 if black_capture_count < 7:
-                    screen.blit(piece.image, (10 + black_capture_count * 35, h + 7 * 100))
+                    self._screen.blit(piece.image, (10 + black_capture_count * 35, h + 7 * 100))
                 else:
-                    screen.blit(piece.image, (10 + (black_capture_count - 7) * 35,
-                                              (h * 1.5) + 7 * 100))
+                    self._screen.blit(piece.image, (10 + (black_capture_count - 7) * 35,
+                                                    (h * 1.5) + 7 * 100))
                 black_capture_count += 1
 
     def update_locations(self) -> None:
@@ -380,11 +379,11 @@ class Board():
     def move_moved(self, color: str, selected_piece: Piece | King,
                    new_location: tuple[int, int],
                    last_location: tuple[int, int]) -> None:
-        """uptates board for a peice that moved
+        """uptates board for a piece that moved
 
         Args:
             color (str): turn
-            selected_piece (Piece | King): peice that player moved
+            selected_piece (Piece | King): piece that player moved
             new_location (tuple[int, int]): new location of moved pice
             last_location (tuple[int, int]): last locaiton of moved piece
         """
@@ -762,17 +761,16 @@ class Board():
             return True
         return False
 
-    def draw_end_popup(self, screen: pygame.surface.Surface, turn: str) -> bool:
+    def draw_end_popup(self, turn: str) -> bool:
         """When the game ends, fill screen with prompt
         askingplay again or quit the game.
         Args:
-            screen (pygame.surface.Surface): screen allowing drawing
             turn (str): the winner, or any if stalemate
 
         Returns:
             bool: _description_
         """
-        screen.fill((255, 255, 255))
+        self._screen.fill((255, 255, 255))
 
         font_header = pygame.font.Font('font/ka1.ttf', 100)
         font_title = pygame.font.Font('font/ka1.ttf', 70)
@@ -791,8 +789,8 @@ class Board():
 
         message = font_title.render("Do you want to play again?", True, 'black')
         message_rect = message.get_rect(center=(self._width // 2, self._height // 3))
-        screen.blit(endcondition, endcondition_rect)
-        screen.blit(message, message_rect)
+        self._screen.blit(endcondition, endcondition_rect)
+        self._screen.blit(message, message_rect)
 
         button_w = 150
         button_h = 50
@@ -801,18 +799,18 @@ class Board():
         play_button_x = (self._width - button_w - 250) // 2
         quit_button_x = (self._width + 100) // 2
 
-        pygame.draw.rect(screen, 'green', [500, button_y, 350, button_h])
-        pygame.draw.rect(screen, 'red', [quit_button_x, button_y, button_w, button_h])
+        pygame.draw.rect(self._screen, 'green', [500, button_y, 350, button_h])
+        pygame.draw.rect(self._screen, 'red', [quit_button_x, button_y, button_w, button_h])
 
         play_text = font.render("Play Again", True, 'black')
         play_text_rect = play_text.get_rect(center=(play_button_x + button_w // 2,
                                                     button_y + button_h // 2))
-        screen.blit(play_text, play_text_rect)
+        self._screen.blit(play_text, play_text_rect)
 
         quit_text = font.render("Quit", True, 'black')
         quit_text_rect = quit_text.get_rect(center=(quit_button_x + button_w // 2,
                                                     button_y + button_h // 2))
-        screen.blit(quit_text, quit_text_rect)
+        self._screen.blit(quit_text, quit_text_rect)
 
         pygame.display.flip()
 
@@ -851,22 +849,22 @@ class Board():
             x_pos += 200
 
         # Draw queen option
-        queen_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+        queen_image = pygame.transform.scale(pygame.image.load('images/' + piece.color +
                                              '/queen.png'), (90, 90))
         queen_rect = queen_image.get_rect(topleft=(450, 400))
         self._screen.blit(queen_image, queen_rect)
         # Draw bishop option
-        bishop_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+        bishop_image = pygame.transform.scale(pygame.image.load('images/' + piece.color +
                                               '/bishop.png'), (90, 90))
         bishop_rect = bishop_image.get_rect(topleft=(650, 400))
         self._screen.blit(bishop_image, bishop_rect)
         # Draw rook option
-        rook_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+        rook_image = pygame.transform.scale(pygame.image.load('images/' + piece.color +
                                             '/rook.png'), (90, 90))
         rook_rect = rook_image.get_rect(topleft=(850, 400))
         self._screen.blit(rook_image, rook_rect)
         # Draw knight option
-        knight_image = pygame.transform.scale(pygame.image.load('images/' + piece._color +
+        knight_image = pygame.transform.scale(pygame.image.load('images/' + piece.color +
                                               '/knight.png'), (90, 90))
         knight_rect = knight_image.get_rect(topleft=(1050, 400))
         self._screen.blit(knight_image, knight_rect)
@@ -881,30 +879,30 @@ class Board():
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     coords = piece.location
                     color = piece.color
-                    new_peice: Piece
+                    new_piece: Piece
 
                     if queen_rect.collidepoint(event.pos):
-                        new_peice = Queen(color, coords)
-                        self.promote_peice(new_peice, piece)
+                        new_piece = Queen(color, coords)
+                        self.promote_piece(new_piece, piece)
                         promoted = True
                     elif bishop_rect.collidepoint(event.pos):
-                        new_peice = Bishop(color, coords)
-                        self.promote_peice(new_peice, piece)
+                        new_piece = Bishop(color, coords)
+                        self.promote_piece(new_piece, piece)
                         promoted = True
                     elif rook_rect.collidepoint(event.pos):
-                        new_peice = Rook(color, coords)
-                        self.promote_peice(new_peice, piece)
+                        new_piece = Rook(color, coords)
+                        self.promote_piece(new_piece, piece)
                         promoted = True
                     elif knight_rect.collidepoint(event.pos):
-                        new_peice = Knight(color, coords)
-                        self.promote_peice(new_peice, piece)
+                        new_piece = Knight(color, coords)
+                        self.promote_piece(new_piece, piece)
                         promoted = True
 
-    def promote_peice(self, promote: Piece, piece: Pawn) -> None:
-        """removes the piece(pawn) and creates a new peice as a "promotion"
+    def promote_piece(self, promote: Piece, piece: Pawn) -> None:
+        """removes the piece(pawn) and creates a new piece as a "promotion"
 
         Args:
-            promote (Piece): new peice
+            promote (Piece): new piece
             piece (Pawn): promoting pawn
         """
         if piece.color == 'white':

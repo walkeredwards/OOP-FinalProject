@@ -39,8 +39,8 @@ def main() -> None:
     game.setup_pieces()
 
     # draws board
-    game.make_board(screen, turn)
-    game.draw_pieces(screen)
+    game.make_board(turn)
+    game.draw_pieces()
 
     # game loop
     while running:
@@ -49,10 +49,10 @@ def main() -> None:
         # Takes care of keyboard/mouse input
         for event in pygame.event.get():
             # draws the board after player click
-            game.make_board(screen, turn)
-            game.highlight_selected(player_1.selected_piece_info, screen, turn)
-            game.highlight_selected(player_2.selected_piece_info, screen, turn)
-            game.draw_pieces(screen)
+            game.make_board(turn)
+            game.highlight_selected(player_1.selected_piece_info, turn)
+            game.highlight_selected(player_2.selected_piece_info, turn)
+            game.draw_pieces()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if turn == "white":
                     player = player_1
@@ -76,15 +76,15 @@ def main() -> None:
                         # if move is valid then switch turns
                         turn = "white" if turn == "black" else "black"
             # exit window
-            if event.type == pygame.QUIT:
+            elif event.type == pygame.QUIT:
                 running = False
 
         if game.check_endgame_conditions("white" if turn == "black" else "black"):
-            if game.draw_end_popup(screen, "white" if turn == "black" else "black"):
+            if game.draw_end_popup("white" if turn == "black" else "black"):
                 game = Board(WIDTH, HEIGHT, screen)
                 game.setup_pieces()
-                game.make_board(screen, turn)
-                game.draw_pieces(screen)
+                game.make_board(turn)
+                game.draw_pieces()
                 turn = 'white'
             else:
                 running = False
