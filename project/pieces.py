@@ -201,9 +201,6 @@ class Pawn(Piece):
 
         return move
 
-    # def promotion():
-        """ If pawn reaches end of board, player can promote to piece of choosing."""
-
 
 class Bishop(Piece):
     """Bishop class"""
