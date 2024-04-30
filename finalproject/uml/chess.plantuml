@@ -1,0 +1,90 @@
+@startuml Chess Game Classes Diagram
+scale 2
+title "Chess Game Classes Diagram"
+class Main {
+    - _caption: str
+    + main(): None
+}
+
+class Board {
+    - _width: int
+    - _height: int
+    - _screen: Surface
+    + setup_pieces(): None
+    + make_board(): None
+    + highlight_selected(): None
+    + draw_pieces(): None
+    + update_locations(): None
+    + select(): Piece | King | None
+    + move(): bool
+    + enpassant(): None
+    + check_capture(): None
+    + is_in_check(): bool
+    + in_check_block(): list[tuple[int, int]]
+    + actual_moves(): list[tuple[int, int]]
+    + check_can_move(): list[tuple[int, int]]
+    + check_checkmate(): bool
+    + check_stalemate(): bool
+    + check_endgame_conditions(): bool
+    + endgame(): bool
+}
+
+class Piece {
+    - _color: str
+    - _location: tuple[int, int]
+    - _image: Surface
+    + color(): str
+    + location(): tuple[int, int]
+    + image(): Surface
+    + possible_moves(): list[tuple[int, int]]
+    + protect_moves(): list[tuple[int, int]]
+    + move(): bool
+}
+
+class Pawn
+class Bishop
+class Knight
+class Rook
+class Queen
+
+class King {
+    - _color: str
+    - _location: tuple[int, int]
+    - moved: bool
+    - _image: Surface
+    + color()
+    + location()
+    + image()
+    + possible_moves(): list[tuple[int, int]]
+    + protect_moves(): list[tuple[int, int]]
+    + castle_available(): tuple[bool, bool]
+    + king_castle(): bool
+    + queen_castle(): bool
+    + move(): bool
+    + castle_move(): None
+    + is_safe(): bool
+}
+
+class Player {
+    - _color: str
+    - _selected_piece_info: Piece | None | King
+    + color()
+    + selected_piece_info(): Piece | King | None
+    + selected_piece_info(): None
+    + click(): tuple[int, int]
+}
+
+Main --> Board
+Main --> Player
+
+Board --> Piece
+Player --> Piece
+
+King --> Piece
+Piece <|-- Pawn
+Piece <|-- Bishop
+Piece <|-- Knight
+Piece <|-- Rook
+Piece <|-- Queen
+
+@enduml

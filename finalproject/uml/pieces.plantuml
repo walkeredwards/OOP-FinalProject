@@ -1,0 +1,80 @@
+@startuml Piece Classes Diagram
+scale 2
+title "Piece Classes Diagram"
+
+class Piece {
+    - _color: str
+    - _location: tuple[int, int]
+    - _image: Surface
+    + color(): str
+    + location(): tuple[int, int]
+    + image(): Surface
+    + possible_moves(): list[tuple[int, int]]
+    + protect_moves(): list[tuple[int, int]]
+    + move(): bool
+}
+
+class Pawn(Piece) {
+    - _color: str
+    - _location: tuple[int, int]
+    - _image: Surface
+    - enpassant: bool
+    + possible_moves(): list[tuple[int, int]]
+    + protect_moves(): list[tuple[int, int]]
+    + move(): bool
+}
+
+class Bishop(Piece) {
+    - _color: str
+    - _location: tuple[int, int]
+    - _image: Surface
+    + possible_moves(): list[tuple[int, int]]
+    + protect_moves(): list[tuple[int, int]]
+    + move(): bool
+}
+
+class Knight(Piece) {
+    - _color: str
+    - _location: tuple[int, int]
+    - _image: Surface
+    + possible_moves(): list[tuple[int, int]]
+    + protect_moves(): list[tuple[int, int]]
+}
+
+class Rook(Piece) {
+    - _color: str
+    - _location: tuple[int, int]
+    - _image: Surface
+    + possible_moves(): list[tuple[int, int]]
+    + protect_moves(): list[tuple[int, int]]
+    + move(): bool
+}
+
+class Queen(Piece) {
+    - _color: str
+    - _location: tuple[int, int]
+    - _image: Surface
+    + possible_moves(): list[tuple[int, int]]
+    + protect_moves(): list[tuple[int, int]]
+    + move(): bool
+}
+
+class King {
+    - _color: str
+    - _location: tuple[int, int]
+    - moved: bool
+    - _image: Surface
+    + color()
+    + location()
+    + image()
+    + possible_moves(): list[tuple[int, int]]
+    + protect_moves(): list[tuple[int, int]]
+    + castle_available(): tuple[bool, bool]
+    + king_castle(): bool
+    + queen_castle(): bool
+    + move(): bool
+    + castle_move(): None
+    + is_safe(): bool
+}
+
+@enduml

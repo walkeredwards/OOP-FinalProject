@@ -32,11 +32,16 @@ jobs:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
+<<<<<<< HEAD
         flake8  --max-complexity=10 --max-line-length=100 --count --show-source --statistics Game
+=======
+        flake8  --max-complexity=10 --max-line-length=100 --count --show-source --statistics finalproject
+>>>>>>> main
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         # flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Check types with mypy
       run: |
+<<<<<<< HEAD
         mypy --strict --allow-untyped-decorators --ignore-missing-imports Game
     - name: Test with pytest
       run: |
@@ -44,11 +49,25 @@ jobs:
     - name: Generate coverage report
       run: |
         pytest --cov-report=xml:Game/coverage.xml --cov=Game Game/tests
+=======
+        mypy --strict --allow-untyped-decorators --ignore-missing-imports finalproject
+    - name: Test with pytest
+      run: |
+        pytest --verbose finalproject/tests
+    - name: Generate coverage report
+      run: |
+        pytest --cov-report=xml:finalproject/coverage.xml --cov=finalproject finalproject/tests
+        codecov
+>>>>>>> main
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
         fail_ci_if_error: false # optional (default = false)
+<<<<<<< HEAD
         files: Game/coverage.xml 
+=======
+        files: finalproject/coverage.xml
+>>>>>>> main
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: rambasnet/course-container
           

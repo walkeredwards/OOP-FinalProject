@@ -240,4 +240,4 @@ class Chess():
 
 # Main function with game loop
 if __name__ == "__main__":
-    game = Game
+    Chess.start()
