@@ -794,23 +794,27 @@ class Board():
             x_pos += 200
 
         # Draw queen option
-        queen_image = pygame.transform.scale(pygame.image.load('./images/' + piece.color +
-                                             '/queen.png'), (90, 90))
+        queen_image = pygame.transform.scale(pygame.image.load('finalproject/images/' +
+                                                               piece.color +
+                                                               '/queen.png'), (90, 90))
         queen_rect = queen_image.get_rect(topleft=(450, 400))
         self._screen.blit(queen_image, queen_rect)
         # Draw bishop option
-        bishop_image = pygame.transform.scale(pygame.image.load('./images/' + piece.color +
-                                              '/bishop.png'), (90, 90))
+        bishop_image = pygame.transform.scale(pygame.image.load('finalproject/images/' +
+                                                                piece.color +
+                                                                '/bishop.png'), (90, 90))
         bishop_rect = bishop_image.get_rect(topleft=(650, 400))
         self._screen.blit(bishop_image, bishop_rect)
         # Draw rook option
-        rook_image = pygame.transform.scale(pygame.image.load('./images/' + piece.color +
-                                            '/rook.png'), (90, 90))
+        rook_image = pygame.transform.scale(pygame.image.load('finalproject/images/' +
+                                                              piece.color +
+                                                              '/rook.png'), (90, 90))
         rook_rect = rook_image.get_rect(topleft=(850, 400))
         self._screen.blit(rook_image, rook_rect)
         # Draw knight option
-        knight_image = pygame.transform.scale(pygame.image.load('./images/' + piece.color +
-                                              '/knight.png'), (90, 90))
+        knight_image = pygame.transform.scale(pygame.image.load('finalproject/images/' +
+                                                                piece.color +
+                                                                '/knight.png'), (90, 90))
         knight_rect = knight_image.get_rect(topleft=(1050, 400))
         self._screen.blit(knight_image, knight_rect)
 
