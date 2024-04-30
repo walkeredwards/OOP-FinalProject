@@ -4,12 +4,10 @@ __date__ = "26 April 2024"
 __license__ = "MIT"
 
 import pygame
-import os
 from pygame.locals import K_f
 from board import Board
 from player import Player
 
-os.chdir("project")
 
 pygame.init()
 
@@ -20,6 +18,7 @@ HEIGHT = 900
 
 class Chess():
     """main driver for game of chess"""
+
     def __init__(self) -> None:
         """initialize pygame and players"""
         # creates pygame screen
@@ -240,4 +239,4 @@ class Chess():
 
 # Main function with game loop
 if __name__ == "__main__":
-    game = Game
+    Chess.start()

@@ -11,6 +11,7 @@ from pieces import King
 
 class Player():
     """player class"""
+
     def __init__(self, color: str) -> None:
         """initialization"""
         self._color: str = color  # color black or white

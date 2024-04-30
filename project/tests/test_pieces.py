@@ -18,6 +18,7 @@ HYP_COLOR = some.one_of(some.just("black"), some.just("white"))
 
 class TestRook(unittest.TestCase):
     """tests for rook"""
+
     def test_rook(self) -> None:
         """test rook with no other pieces"""
 
@@ -104,6 +105,7 @@ class TestRook(unittest.TestCase):
 
 class TestKnight(unittest.TestCase):
     """tests for Knight"""
+
     def test_Knight(self) -> None:
         """test with no other pieces"""
 
@@ -191,6 +193,7 @@ class TestKnight(unittest.TestCase):
 
 class TestBishop(unittest.TestCase):
     """tests for bishop"""
+
     def test_bishop(self) -> None:
         """test with no other pieces"""
 
@@ -279,6 +282,7 @@ class TestBishop(unittest.TestCase):
 
 class TestQueen(unittest.TestCase):
     """tests for queen"""
+
     def test_queen(self) -> None:
         """test with no other pieces"""
 
@@ -374,6 +378,7 @@ class TestQueen(unittest.TestCase):
 
 class TestPawn(unittest.TestCase):
     """tests for pawn"""
+
     def test_pawn(self) -> None:
         """test with no other pieces"""
 
