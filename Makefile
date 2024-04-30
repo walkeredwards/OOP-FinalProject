@@ -10,36 +10,20 @@ all: check-style check-type run-test-coverage clean
 
 .PHONY: check-type
 check-type:
-<<<<<<< HEAD
 	$(TYPE_CHECK) project
 
 .PHONY: check-style
 check-style:
 	$(STYLE_CHECK) project
-=======
-	$(TYPE_CHECK) finalproject
-
-.PHONY: check-style
-check-style:
-	$(STYLE_CHECK) finalproject
->>>>>>> main
 
 # discover and run all tests
 .PHONY: run-test
 run-test:
-<<<<<<< HEAD
 	$(TEST) $(TEST_ARGS) project
 
 .PHONY: run-test-coverage
 run-test-coverage:
 	$(COVERAGE) -v --cov-report=html:project/htmlcov --cov-report=term --cov=project
-=======
-	$(TEST) $(TEST_ARGS) finalproject/tests
-
-.PHONY: run-test-coverage
-run-test-coverage:
-	$(COVERAGE) -v --cov-report=html:finalproject/htmlcov --cov-report=term --cov=finalproject finalproject/tests
->>>>>>> main
 
 
 .PHONY: clean

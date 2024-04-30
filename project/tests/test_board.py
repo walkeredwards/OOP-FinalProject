@@ -15,6 +15,7 @@ class TestBoard(unittest.TestCase):
     """
     Unittesting for Board Class
     """
+
     def setUp(self) -> None:
         screen = pygame.display.set_mode([1600, 900])
         self.board = Board(1600, 900, screen)
