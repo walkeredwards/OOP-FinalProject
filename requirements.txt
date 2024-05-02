@@ -1,6 +1,5 @@
 pytest
 pytest-cov
-pygame
 jupyter
 pymongo[srv]
 mypy

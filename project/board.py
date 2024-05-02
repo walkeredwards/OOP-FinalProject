@@ -37,6 +37,7 @@ from pieces import Pawn
 
 class Board():
     """board class"""
+
     def __init__(self, width: int, height: int, screen: pygame.surface.Surface) -> None:
         """board initalizer.
 
