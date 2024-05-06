@@ -23,6 +23,8 @@ run-test:
 
 .PHONY: run-test-coverage
 run-test-coverage:
+# allows pytest to find the image paths within the container
+	cd project && \
 	$(COVERAGE) -v --cov-report=html:project/htmlcov --cov-report=term --cov=project
 
 
