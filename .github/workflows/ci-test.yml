@@ -37,7 +37,9 @@ jobs:
         # flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Check types with mypy
       run: |
+        cd projects
         mypy --strict --allow-untyped-decorators --ignore-missing-imports Game
+        cd ..
     - name: Test with pytest
       run: |
         pytest --verbose Game/tests
