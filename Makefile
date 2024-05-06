@@ -19,7 +19,8 @@ check-style:
 # discover and run all tests
 .PHONY: run-test
 run-test:
-	$(TEST) $(TEST_ARGS) project
+	cd project && \
+	$(TEST) $(TEST_ARGS)
 
 .PHONY: run-test-coverage
 run-test-coverage:

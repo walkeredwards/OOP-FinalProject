@@ -40,10 +40,12 @@ jobs:
         mypy --strict --allow-untyped-decorators --ignore-missing-imports project
     - name: Test with pytest
       run: |
-        pytest --verbose project/tests
+        cd project
+        pytest --verbose tests
     - name: Generate coverage report
       run: |
-        pytest --cov-report=xml:project/coverage.xml --cov=project project/tests
+        cd project
+        pytest --cov-report=xml:coverage.xml --cov=project tests
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
