@@ -40,9 +40,7 @@ jobs:
         mypy --strict --allow-untyped-decorators --ignore-missing-imports project
     - name: Test with pytest
       run: |
-        cd projedcts
         pytest --verbose project/tests
-        cd ..
     - name: Generate coverage report
       run: |
         pytest --cov-report=xml:project/coverage.xml --cov=project project/tests
