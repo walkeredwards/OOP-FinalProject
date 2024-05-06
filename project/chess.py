@@ -4,12 +4,9 @@ __date__ = "26 April 2024"
 __license__ = "MIT"
 
 import pygame
-import os
 from pygame.locals import K_f
 from board import Board
 from player import Player
-
-os.chdir("project")
 
 pygame.init()
 
