@@ -42,7 +42,7 @@ jobs:
         cd ..
     - name: Test with pytest
       run: |
-        pytest --verbose project/tests
+        pytest --verbose tests
     - name: Generate coverage report
       run: |
         pytest --cov-report=xml:project/coverage.xml --cov=project project/tests
