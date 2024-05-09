@@ -17,8 +17,8 @@
 # Screenshots and Showcase Grades
 |   **Name**    |   **Link**   |
 | ------------- | ------------- |
-|  Location     | https://github.com/walkeredwards/OOP-FinalProject/tree/main/screenshots |
-|  Location     | https://github.com/walkeredwards/OOP-FinalProject/tree/main/showcase-grades |
+|  Screenshots     | https://github.com/walkeredwards/OOP-FinalProject/tree/main/screenshots |
+|  Showcase Grades  | https://github.com/walkeredwards/OOP-FinalProject/tree/main/showcase-grades |
 
 ## Final Project for OOP 
 |   **NAME**    |   **VALUE**   |
