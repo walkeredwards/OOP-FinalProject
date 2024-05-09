@@ -14,6 +14,12 @@
 |Step 2|Go into project|
 |Step 3|Type: make|
 
+# Screenshots and Showcase Grades
+|   **Name**    |   **Link**   |
+| ------------- | ------------- |
+|  Location     | https://github.com/walkeredwards/OOP-FinalProject/tree/main/screenshots |
+|  Location     | https://github.com/walkeredwards/OOP-FinalProject/tree/main/showcase-grades |
+
 ## Final Project for OOP 
 |   **NAME**    |   **VALUE**   |
 | ------------- | ------------- |
