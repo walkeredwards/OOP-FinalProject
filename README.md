@@ -1,5 +1,15 @@
 # OOP-FinalProject
 
+# How to Run
+|Go into project folder|
+|Make sure pygame is installed|
+|Type: python3 chess.py|
+
+# How to Test
+|Run the container|
+|Go into project|
+|Type: make|
+
 ## Final Project for OOP 
 |   **NAME**    |   **VALUE**   |
 | ------------- | ------------- |
